@@ -86,7 +86,14 @@ export default function Home() {
       <AgentIntent
         sessionAddress={sessionAddress}
         delegationRules={delegationRules}
-        onIntentParsed={(parsedTx) => setParsedIntentTx(parsedTx)}
+        onIntentParsed={(parsedTx) => {
+          // 1. CRITICAL RESET MECHANISM: Evict stale blocks from memory instantly
+          setCurrentSimResult(null);
+          setRelayReadyPayload(null);
+          
+          // 2. Introduce the fresh intent request context down the loop
+          setParsedIntentTx(parsedTx);
+        }}
       />
 
       {/* UPDATE EXECUTION SIMULATOR COMPONENT MOUNT TO RECEIVE THE PASSED STATE PROPS */}

@@ -1,7 +1,7 @@
 // components/TransactionBuilder.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TransactionBuilderProps {
   simResult: {
@@ -26,8 +26,24 @@ interface TransactionBuilderProps {
 export default function TransactionBuilder({ simResult, onPayloadGenerated }: TransactionBuilderProps) {
   const [isFinalized, setIsFinalized] = useState(false);
 
-  if (!simResult || simResult.status !== 'ALLOWED' || !simResult.parsedData) {
-    return null;
+  // State listener to clear the freeze lock if a new intent stream arrives
+  useEffect(() => {
+    setIsFinalized(false);
+  }, [simResult?.parsedData]); // Resets whenever the underlying parsed token payload changes
+
+  if (!simResult) return null;
+
+  // STRESS TEST: Safe rejection UI when the Validator drops a BLOCKED result or Zero action
+  if (simResult.status === 'BLOCKED' || !simResult.parsedData || simResult.parsedData.amount === 0) {
+    return (
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl col-span-1 md:col-span-2 mt-8 opacity-60">
+        <h2 className="text-xl font-bold tracking-tight text-rose-500 font-mono">Step 7: Transaction Builder Layer</h2>
+        <p className="text-xs text-slate-400 mt-0.5">Pipeline execution frozen by security enforcement sub-system.</p>
+        <div className="mt-4 bg-rose-950/20 border border-rose-900/40 p-3 rounded-lg font-mono text-xs text-rose-300 italic">
+          🛑 BUILDER LOCKED: Cannot compile an EVM payload container for invalid, blocked, or non-actionable intent requests.
+        </div>
+      </div>
+    );
   }
 
   const { amount, target, token } = simResult.parsedData;
