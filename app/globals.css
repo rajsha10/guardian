@@ -1,26 +1,225 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&f[]=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Core Brand Colors mapping to Slate (surfaces, backgrounds, texts) */
+  --color-slate-50: #050816;
+  --color-slate-100: rgba(5, 8, 22, 0.95);
+  --color-slate-200: rgba(5, 8, 22, 0.85);
+  --color-slate-300: rgba(5, 8, 22, 0.75);
+  --color-slate-400: rgba(5, 8, 22, 0.65); /* Secondary Text */
+  --color-slate-500: rgba(5, 8, 22, 0.45);
+  --color-slate-600: rgba(5, 8, 22, 0.35);
+  --color-slate-700: rgba(5, 8, 22, 0.20);
+  --color-slate-800: rgba(5, 8, 22, 0.08); /* Border color */
+  --color-slate-850: rgba(5, 8, 22, 0.08);
+  --color-slate-900: rgba(5, 8, 22, 0.04); /* Surface */
+  --color-slate-950: rgba(5, 8, 22, 0.06); /* Elevated Surface */
+
+  /* Primary Accent: #00F5D4 (Teal/Mint) */
+  --color-primary-accent: #00F5D4;
+  --color-sky-400: #00F5D4;
+  --color-amber-200: rgba(0, 245, 212, 0.8);
+  --color-amber-300: #00F5D4;
+  --color-amber-400: #00F5D4;
+  --color-amber-500: #00F5D4;
+  --color-amber-600: #00F5D4;
+  --color-amber-950: rgba(0, 245, 212, 0.06);
+
+  /* Secondary Accent: #7B61FF (Violet/Purple) */
+  --color-secondary-accent: #7B61FF;
+  --color-indigo-400: #7B61FF;
+  --color-indigo-500: #7B61FF;
+  --color-indigo-600: #7B61FF;
+  --color-indigo-800: rgba(123, 97, 255, 0.2);
+  --color-indigo-900: rgba(123, 97, 255, 0.1);
+  --color-indigo-950: rgba(123, 97, 255, 0.06);
+
+  --color-violet-400: #7B61FF;
+  --color-violet-500: #7B61FF;
+  --color-violet-600: #7B61FF;
+  --color-violet-950: rgba(123, 97, 255, 0.06);
+
+  /* Success: #00E676 */
+  --color-emerald-200: rgba(0, 230, 118, 0.8);
+  --color-emerald-400: #00E676;
+  --color-emerald-500: #00E676;
+  --color-emerald-600: #00C853;
+  --color-emerald-800: rgba(0, 230, 118, 0.2);
+  --color-emerald-950: rgba(0, 230, 118, 0.06);
+
+  /* Danger: #FF4D6D */
+  --color-rose-200: rgba(255, 77, 109, 0.8);
+  --color-rose-400: #FF4D6D;
+  --color-rose-500: #FF4D6D;
+  --color-rose-950: rgba(255, 77, 109, 0.06);
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "Clash Grotesk", "Satoshi", system-ui, -apple-system, sans-serif;
+
+  /* Radius (20px - 28px) */
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* Global Spacing Scale */
+  --spacing: 0.28rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Base style resets & background styling */
+html, body {
+  background-color: #F4F4F4 !important;
+  background-image: none !important;
+  color: #050816 !important;
+  font-family: "Inter", var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Editorial Heading Styling */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Clash Grotesk", "Satoshi", var(--font-sans), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  text-transform: tracking-tight;
+  color: #050816 !important;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Subheadings / Accent Titles */
+h2 {
+  background: linear-gradient(135deg, #050816 0%, rgba(5, 8, 22, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism for Containers */
+.bg-slate-900, [class*="bg-slate-900"] {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(5, 8, 22, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(5, 8, 22, 0.08) !important;
+}
+
+.bg-slate-950, [class*="bg-slate-950"] {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(5, 8, 22, 0.08) !important;
+}
+
+/* Inputs, Textareas, Select elements */
+input[type="text"], input[type="number"], select, textarea, .w-full.bg-slate-950 {
+  background-color: rgba(5, 8, 22, 0.04) !important;
+  border: 1px solid rgba(5, 8, 22, 0.08) !important;
+  border-radius: 20px !important;
+  color: #050816 !important;
+  transition: all 0.3s ease !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.guarding-input {
+  background-color: rgba(5, 8, 22, 0.06) !important;
+  border: 1px solid rgba(5, 8, 22, 0.18) !important;
+  color: #050816 !important;
+  border-radius: 20px !important;
+  font-family: monospace !important;
+}
+
+.guarding-input:focus {
+  border-color: #00F5D4 !important;
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.2) !important;
+  outline: none !important;
+}
+
+input::placeholder {
+  color: rgba(5, 8, 22, 0.4) !important;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+  border-color: #00F5D4 !important;
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.15) !important;
+  outline: none !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(123, 97, 255, 0.3);
+  border-radius: 9999px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 212, 0.6);
+}
+
+/* Selection highlight colors */
+::selection {
+  background-color: rgba(0, 245, 212, 0.25);
+  color: #00F5D4;
+}
+
+/* Button Refinement: Pill Shaped, Smooth transitions, Slight glow accents */
+button, .button, input[type="button"], input[type="submit"] {
+  border-radius: 9999px !important;
+  font-family: "Inter", var(--font-sans), sans-serif !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+button:hover:not(:disabled), .button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Custom button accent glows depending on color */
+button[class*="from-indigo-600"], button[class*="bg-indigo-600"], button[class*="bg-violet-600"], button[class*="from-violet-600"] {
+  box-shadow: 0 0 12px rgba(123, 97, 255, 0.2) !important;
+}
+button[class*="from-indigo-600"]:hover, button[class*="bg-indigo-600"]:hover, button[class*="bg-violet-600"]:hover, button[class*="from-violet-600"]:hover {
+  box-shadow: 0 0 24px rgba(123, 97, 255, 0.45) !important;
+}
+
+button[class*="from-emerald-600"], button[class*="bg-emerald-600"], button[class*="from-emerald-500"] {
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.2) !important;
+}
+button[class*="from-emerald-600"]:hover, button[class*="bg-emerald-600"]:hover, button[class*="from-emerald-500"]:hover {
+  box-shadow: 0 0 24px rgba(0, 230, 118, 0.45) !important;
+}
+
+button[class*="from-amber-500"], button[class*="bg-amber-600"], button[class*="from-amber-600"] {
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.2) !important;
+}
+button[class*="from-amber-500"]:hover, button[class*="bg-amber-600"]:hover, button[class*="from-amber-600"]:hover {
+  box-shadow: 0 0 24px rgba(0, 245, 212, 0.45) !important;
+}
+
+/* Hide default HTML5 number input spin-button arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+input[type="number"] {
+  -moz-appearance: textfield !important; /* Firefox */
 }

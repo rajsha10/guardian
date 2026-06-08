@@ -1,19 +1,11 @@
-// components/AgentIntent.tsx
 'use client';
 
 import { useState } from 'react';
+import { useGuardingState } from '../GuardingContext';
+import Panel from '../shared/Panel';
 
-interface AgentIntentProps {
-  sessionAddress: string | null;
-  delegationRules: {
-    spendLimit: string;
-    allowedAddress: string;
-    expiryDays: number;
-  } | null;
-  onIntentParsed: (parsedTx: { amount: number; target: string; token: string; label: string }) => void;
-}
-
-export default function AgentIntent({ sessionAddress, delegationRules, onIntentParsed }: AgentIntentProps) {
+export default function AgentIntent() {
+  const { sessionAddress, delegationRules, setParsedIntentTx, setCurrentSimResult, setRelayReadyPayload, setRobotState } = useGuardingState();
   const [userInput, setUserInput] = useState('Move 50 USDC to savings');
   const [isParsing, setIsParsing] = useState(false);
   const [parsedLog, setParsedLog] = useState<any | null>(null);
@@ -25,7 +17,13 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
     setIsParsing(true);
     setParsedLog(null);
     setUserInput(textToParse);
+    setRobotState('processing');
     
+    // Clear downstream execution states
+    setCurrentSimResult(null);
+    setRelayReadyPayload(null);
+    setParsedIntentTx(null);
+
     try {
       const response = await fetch('/api/agent', {
         method: 'POST',
@@ -64,7 +62,7 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
       };
 
       setParsedLog(payloadResult);
-      onIntentParsed(payloadResult);
+      setParsedIntentTx(payloadResult);
     } catch (error) {
       console.warn('Fallback to local simulation due to:', error);
       const lowercaseInput = textToParse.toLowerCase();
@@ -97,7 +95,7 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
       };
 
       setParsedLog(payloadResult);
-      onIntentParsed(payloadResult);
+      setParsedIntentTx(payloadResult);
     } finally {
       setIsParsing(false);
     }
@@ -109,7 +107,6 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
     processIntentParsing(userInput);
   };
 
-  // Pre-compiled high-impact presentation demo shortcuts
   const demoMacros = [
     { label: '🟢 Move 50 USDC to Savings', text: 'Move 50 USDC to savings' },
     { label: '🟢 Liquidate Monthly Rent', text: 'Pay rent obligation for this period: 250 USDC' },
@@ -118,20 +115,26 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
   ];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl col-span-1 md:col-span-2 mt-8">
+    <Panel className="col-span-1 md:col-span-2">
       <div className="flex justify-between items-center mb-2">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-sky-400 font-mono">Step 6: AI Intent Parser Hub</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Translate raw language inputs directly into verified cryptographic transaction parameters.</p>
+          <h2 className="text-xl font-bold tracking-tight text-sky-400 font-heading uppercase">
+            AI Intent Parser Hub
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5 font-medium font-sans">
+            Translate raw language inputs directly into verified cryptographic transaction parameters.
+          </p>
         </div>
-        <span className="bg-sky-950/60 text-sky-400 border border-sky-800/60 rounded-full px-2 py-0.5 text-[10px] font-mono">
+        <span className="bg-sky-950/60 text-sky-400 border border-sky-800/60 rounded-full px-2.5 py-0.5 text-[9px] font-mono font-bold tracking-wider uppercase">
           NLP Pipeline Online
         </span>
       </div>
 
       {/* Quick Click Macro Layout */}
-      <div className="mb-4">
-        <label className="block text-[10px] font-mono text-slate-500 font-bold mb-2 uppercase tracking-wider">Demo Quick-Actions Shortcut Panel</label>
+      <div className="mb-4 mt-4">
+        <label className="block text-[10px] font-mono text-slate-500 font-bold mb-2 uppercase tracking-wider">
+          Demo Quick-Actions Shortcut Panel
+        </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {demoMacros.map((macro, idx) => (
             <button
@@ -139,7 +142,7 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
               type="button"
               disabled={isParsing}
               onClick={() => processIntentParsing(macro.text)}
-              className="bg-slate-950 hover:bg-slate-850 text-slate-300 border border-slate-800 hover:border-sky-800 p-2.5 rounded-lg text-left text-xs font-mono transition-all text-ellipsis overflow-hidden whitespace-nowrap block"
+              className="bg-slate-950 hover:bg-slate-850 text-slate-300 border border-slate-800 hover:border-sky-800 p-2.5 rounded-xl text-left text-xs font-mono transition-all text-ellipsis overflow-hidden whitespace-nowrap block cursor-pointer"
             >
               {macro.label}
             </button>
@@ -155,13 +158,13 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Or type a manual structural execution statement..."
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500 placeholder-slate-600 shadow-inner"
+            className="flex-1 guarding-input px-4 py-2.5 text-xs focus:outline-none placeholder-slate-600 shadow-inner"
             required
           />
           <button
             type="submit"
             disabled={isParsing}
-            className="bg-sky-600 hover:bg-sky-500 text-slate-950 font-bold font-mono text-xs px-5 rounded-lg transition-all min-w-[120px]"
+            className="bg-sky-600 hover:bg-sky-500 text-slate-950 font-bold font-mono text-xs px-5 rounded-full transition-all min-w-[120px] border-none cursor-pointer"
           >
             {isParsing ? 'Parsing...' : 'Analyze Intent'}
           </button>
@@ -170,8 +173,8 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
 
       {/* Intermediate Parsed Intelligence Metrics Output Window */}
       {parsedLog && (
-        <div className="mt-4 bg-slate-950 border border-slate-850 p-4 rounded-lg text-xs font-mono text-slate-400 space-y-2 animate-fadeIn">
-          <div className="text-[10px] font-bold uppercase text-sky-500 tracking-wider">
+        <div className="mt-4 bg-slate-950 border border-slate-850 p-4 rounded-xl text-xs font-mono text-slate-400 space-y-2 animate-fadeIn">
+          <div className="text-[9px] font-bold uppercase text-sky-500 tracking-wider">
             Live Venice AI Structured Output Schema
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
@@ -184,6 +187,6 @@ export default function AgentIntent({ sessionAddress, delegationRules, onIntentP
           </div>
         </div>
       )}
-    </div>
+    </Panel>
   );
 }

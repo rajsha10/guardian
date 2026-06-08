@@ -1,0 +1,68 @@
+// components/landing/SafeScenario.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+import AnimatedNodes from './AnimatedNodes';
+
+interface SafeScenarioProps {
+  currentStep: number;
+}
+
+export default function SafeScenario({ currentStep }: SafeScenarioProps) {
+  return (
+    <div className="w-full flex flex-col justify-start relative text-left py-6 select-none">
+      
+      {/* Dynamic Background Glow Layer */}
+      <div className="absolute top-[20%] left-[-20px] w-64 h-64 rounded-full bg-slate-900/[0.02] blur-[80px] pointer-events-none z-0 animate-pulse" />
+
+      {/* Strong Safe Header Label */}
+      <div className="flex flex-col items-start gap-1 relative z-10 border-b border-[#050816]/5 pb-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="relative flex h-3.5 w-3.5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#050816] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#050816] shadow-[0_0_8px_rgba(5,8,22,0.4)]"></span>
+          </div>
+          <h3 className="text-2xl font-extrabold font-heading text-[#050816] uppercase tracking-wide leading-none">
+            SAFE EXECUTION
+          </h3>
+        </div>
+        <p className="text-[10px] md:text-xs text-slate-400 font-mono font-bold uppercase tracking-widest mt-1">
+          Cryptographic Constraints Enabled
+        </p>
+      </div>
+
+      {/* Flowing Vertical Nodes (Whitespace generous) */}
+      <div className="relative z-10 w-full pl-2">
+        <AnimatedNodes isSafe={true} currentStep={currentStep} />
+      </div>
+
+      {/* Floating Hologram Assistant (Observer) */}
+      <motion.div
+        animate={{
+          y: [0, -6, 0],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        className="absolute bottom-6 right-6 z-20 pointer-events-none hidden md:flex items-center gap-3 bg-white/40 border border-[#050816]/20 px-3.5 py-2.5 rounded-2xl backdrop-blur-md shadow-sm"
+      >
+        <div className="w-6 h-6 rounded-xl bg-slate-900/10 flex items-center justify-center border border-slate-800/20 shrink-0">
+          <svg className="w-3.5 h-3.5 text-[#050816]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[7px] font-black font-mono tracking-widest text-[#050816]/50 uppercase leading-none">
+            GUARDIAN CO-PILOT
+          </span>
+          <span className="text-[9px] font-mono font-bold text-[#050816] mt-0.5 leading-none">
+            SECURE ROUTE ACTIVE
+          </span>
+        </div>
+      </motion.div>
+
+    </div>
+  );
+}

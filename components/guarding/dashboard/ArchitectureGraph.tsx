@@ -1,62 +1,53 @@
 'use client';
 
-interface ArchitectureGraphProps {
-  walletAddress: `0x${string}` | undefined;
-  smartAccount: string | null;
-  sessionAddress: string | null;
-  delegationRules: {
-    spendLimit: string;
-    allowedAddress: string;
-    expiryDays: number;
-  } | null;
-}
+import { useAccount } from 'wagmi';
+import { useGuardingState } from '../GuardingContext';
+import Panel from '../shared/Panel';
 
-export default function ArchitectureGraph({
-  walletAddress,
-  smartAccount,
-  sessionAddress,
-  delegationRules,
-}: ArchitectureGraphProps) {
+export default function ArchitectureGraph() {
+  const { address } = useAccount();
+  const { smartAccount, sessionAddress, delegationRules } = useGuardingState();
+
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl col-span-1 md:col-span-2 mt-8">
-      <h2 className="text-xl font-bold mb-6 tracking-tight text-emerald-400 font-mono">
+    <Panel className="col-span-1 md:col-span-2 mt-8">
+      <h2 className="text-xl font-bold mb-6 tracking-tight text-emerald-400 font-heading uppercase">
         System Topology & Trust Boundary Mapping
       </h2>
 
       <div className="flex flex-col items-center space-y-4 font-mono text-xs max-w-xl mx-auto">
         
         {/* Node 1: Primary Signer Wallet */}
-        <div className={`w-full p-3 rounded-lg border text-center transition-all ${
-          walletAddress ? 'bg-slate-950 border-indigo-500 text-indigo-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
+        <div className={`w-full p-3 rounded-xl border text-center transition-all ${
+          address ? 'bg-slate-950/80 border-indigo-500 text-indigo-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
         }`}>
           <span className="block text-[10px] text-slate-500 font-bold">1. USER WALLET (EOA ROOT)</span>
-          {walletAddress ? walletAddress : 'Not Connected'}
+          {address ? address : 'Not Connected'}
         </div>
 
-        <div className="text-slate-600 text-base animate-pulse">↓</div>
+        <div className="text-slate-500 text-base animate-pulse">↓</div>
 
         {/* Node 2: Core Account Container */}
-        <div className={`w-full p-3 rounded-lg border text-center transition-all ${
-          smartAccount ? 'bg-slate-950 border-blue-500 text-blue-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
+        <div className={`w-full p-3 rounded-xl border text-center transition-all ${
+          smartAccount ? 'bg-slate-950/80 border-blue-500 text-blue-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
         }`}>
           <span className="block text-[10px] text-slate-500 font-bold">2. METAMASK SMART ACCOUNT CONTAINER (ERC-4337/7710)</span>
           {smartAccount ? smartAccount : 'Awaiting Core Initialization'}
         </div>
 
-        <div className="text-slate-600 text-base animate-pulse">↓</div>
+        <div className="text-slate-500 text-base animate-pulse">↓</div>
 
         {/* Node 3: Generated Ephemeral AI Signer */}
-        <div className={`w-full p-3 rounded-lg border text-center transition-all ${
-          sessionAddress ? 'bg-slate-950 border-violet-500 text-violet-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
+        <div className={`w-full p-3 rounded-xl border text-center transition-all ${
+          sessionAddress ? 'bg-slate-950/80 border-violet-500 text-violet-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
         }`}>
           <span className="block text-[10px] text-slate-500 font-bold">3. AGENT SESSION ACCOUNT (EPHEMERAL OPERATOR)</span>
           {sessionAddress ? sessionAddress : 'Awaiting Session Key Initialization'}
         </div>
 
-        <div className="text-slate-600 text-base animate-pulse">↓</div>
+        <div className="text-slate-500 text-base animate-pulse">↓</div>
 
         {/* Node 4: Requested Cryptographic Permission Scope */}
-        <div className={`w-full p-4 rounded-lg border text-left transition-all ${
+        <div className={`w-full p-4 rounded-xl border text-left transition-all ${
           delegationRules ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300' : 'bg-slate-950/40 border-slate-800 text-slate-600'
         }`}>
           <span className="block text-[10px] text-slate-500 font-bold text-center mb-2">4. REQUESTED PERMISSION SCOPE</span>
@@ -72,6 +63,6 @@ export default function ArchitectureGraph({
         </div>
 
       </div>
-    </div>
+    </Panel>
   );
 }

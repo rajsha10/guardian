@@ -1,18 +1,8 @@
-// components/ExecutionSimulator.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-
-interface ExecutionSimulatorProps {
-  sessionAddress: string | null;
-  delegationRules: {
-    spendLimit: string;
-    allowedAddress: string;
-    expiryDays: number;
-  } | null;
-  overrideTxPayload?: { amount: number; target: string; token: string; label: string } | null;
-  onSimulationEvaluated?: (result: any) => void;
-}
+import { useEffect } from 'react';
+import { useGuardingState } from '../GuardingContext';
+import Panel from '../shared/Panel';
 
 interface SimulationResult {
   status: 'ALLOWED' | 'BLOCKED';
@@ -25,13 +15,20 @@ interface SimulationResult {
   txPayload?: any;
 }
 
-export default function ExecutionSimulator({ sessionAddress, delegationRules, overrideTxPayload, onSimulationEvaluated }: ExecutionSimulatorProps) {
-  const [simResult, setSimResult] = useState<SimulationResult | null>(null);
+export default function ExecutionSimulator() {
+  const { 
+    sessionAddress, 
+    delegationRules, 
+    parsedIntentTx, 
+    currentSimResult, 
+    setCurrentSimResult, 
+    setRobotState 
+  } = useGuardingState();
 
   const validateExecution = (txRequest: { amount: number; target: string; token: string; timestamp: number }) => {
     if (!delegationRules) return null;
     
-    // STRESS TEST GUARD: Instantly intercept chat-fillers and non-actions (like 0 from "hello")
+    // Intercept zero transactions
     if (!txRequest.amount || txRequest.amount <= 0) {
       return {
         status: 'BLOCKED' as const,
@@ -96,66 +93,76 @@ export default function ExecutionSimulator({ sessionAddress, delegationRules, ov
   };
 
   useEffect(() => {
-    if (overrideTxPayload) {
+    if (parsedIntentTx) {
+      setRobotState('validating');
       const payloadFormat = {
-        amount: overrideTxPayload.amount,
-        target: overrideTxPayload.target,
-        token: overrideTxPayload.token,
+        amount: parsedIntentTx.amount,
+        target: parsedIntentTx.target,
+        token: parsedIntentTx.token,
         timestamp: Math.floor(Date.now() / 1000)
       };
-      const result = validateExecution(payloadFormat);
-      if (result) {
-        setSimResult(result);
-        if (onSimulationEvaluated) onSimulationEvaluated(result);
-      }
+
+      // Simulate a small delay for verification visualization
+      const timer = setTimeout(() => {
+        const result = validateExecution(payloadFormat);
+        if (result) {
+          setCurrentSimResult(result);
+          if (result.status === 'BLOCKED') {
+            setRobotState('warning');
+          } else {
+            setRobotState('listening');
+          }
+        }
+      }, 700);
+
+      return () => clearTimeout(timer);
     } else {
-      setSimResult(null);
-      if (onSimulationEvaluated) onSimulationEvaluated(null);
+      setCurrentSimResult(null);
     }
-  }, [overrideTxPayload]);
+  }, [parsedIntentTx]);
 
   if (!sessionAddress || !delegationRules) return null;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl col-span-1 md:col-span-2 mt-8">
-      <h2 className="text-xl font-bold mb-2 tracking-tight text-emerald-400 font-mono">
-        Step 7: Trust Boundary Enforcement Verdict
+    <Panel className="col-span-1 md:col-span-2">
+      <h2 className="text-xl font-bold mb-2 tracking-tight text-emerald-400 font-heading uppercase">
+        Trust Boundary Verdict
       </h2>
-      <p className="text-xs text-slate-400 mb-4">
+      <p className="text-xs text-slate-400 mb-4 font-sans font-medium">
         Real-time account container interception logs. This core logic runs directly inside the smart account protocol layer.
       </p>
 
-      {simResult ? (
-        <div className={`p-4 rounded-lg border font-mono text-xs shadow-inner transition-all ${
-          simResult.status === 'ALLOWED' 
-            ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-200' 
-            : 'bg-rose-950/30 border-rose-500/50 text-rose-200'
+      {currentSimResult ? (
+        <div className={`p-4 rounded-xl border font-mono text-xs shadow-inner transition-all ${
+          currentSimResult.status === 'ALLOWED' 
+            ? 'bg-emerald-950/20 border-emerald-900/60 text-emerald-200' 
+            : 'bg-rose-950/20 border-rose-900/60 text-rose-200'
         }`}>
           <div className="flex items-center gap-2 font-bold mb-2">
-            <span className={`px-2 py-0.5 rounded text-[10px] tracking-wide font-black ${
-              simResult.status === 'ALLOWED' ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'
+            <span className={`px-2.5 py-0.5 rounded-full text-[9px] tracking-wide font-black ${
+              currentSimResult.status === 'ALLOWED' ? 'bg-emerald-400 text-slate-950' : 'bg-rose-500 text-white'
             }`}>
-              {simResult.status}
+              {currentSimResult.status}
             </span>
-            <span className="text-slate-400">On-Chain Security Intercept Evaluation</span>
+            <span className="text-slate-500 font-bold">On-Chain Security Intercept Evaluation</span>
           </div>
           
-          <p className="text-slate-300 font-medium mb-3 italic">{simResult.reason}</p>
+          <p className="text-slate-300 font-medium mb-3 italic">{currentSimResult.reason}</p>
 
-          {simResult.txPayload && simResult.status === 'ALLOWED' && (
-            <div className="bg-slate-950 p-3 rounded border border-emerald-900/40 text-[11px] text-emerald-400/90 space-y-1">
+          {currentSimResult.txPayload && currentSimResult.status === 'ALLOWED' && (
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-emerald-900/40 text-[11px] text-emerald-400/90 space-y-1">
               <div className="font-bold text-slate-600 uppercase text-[9px] tracking-wider mb-1">Generated Gasless Relayer Object</div>
-              <div><span className="text-slate-500">Origin Contract Account:</span> {simResult.txPayload.from}</div>
-              <div><span className="text-slate-500">Session Signer Source:</span> {simResult.txPayload.signedBySessionKey}</div>
-              <div><span className="text-slate-500">Destination Whitelist:</span> {simResult.parsedData?.target}</div>
+              <div><span className="text-slate-500">Origin Contract Account:</span> {currentSimResult.txPayload.from}</div>
+              <div><span className="text-slate-500">Session Signer Source:</span> {currentSimResult.txPayload.signedBySessionKey}</div>
+              <div className="truncate"><span className="text-slate-500">Destination Whitelist:</span> {currentSimResult.parsedData?.target}</div>
             </div>
           )}
         </div>
       ) : (
-        <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 font-mono text-xs text-slate-600 text-center italic">
+        <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-850 font-mono text-xs text-slate-500 text-center italic">
           Awaiting execution payload from the Intent Parser pipeline...
         </div>
       )}
-    </div>
+    </Panel>
   );
 }
