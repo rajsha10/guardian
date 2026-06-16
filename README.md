@@ -14,6 +14,9 @@ pnpm dev
 bun dev
 ```
 
+0xA8056F29aCA4156de062D5D744F612F5f97265d5
+0xA8056F29aCA4156de062D5D744F612F5f97265d5
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.

@@ -1,14 +1,39 @@
 // components/landing/SecuritySimulationSection.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import SafeScenario from './SafeScenario';
 import UnsafeScenario from './UnsafeScenario';
 
 export default function SecuritySimulationSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  
+  // Track scroll progress of the section relative to viewport
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start center"]
+  });
+
+  // Entry animation parameters
+  const entryOpacity = useTransform(scrollYProgress, [0.1, 0.75], [0, 1]);
+  const entryScale = useTransform(scrollYProgress, [0.1, 0.75], [0.96, 1]);
+  const entryY = useTransform(scrollYProgress, [0.1, 0.75], [80, 0]);
+  const entryBlur = useTransform(scrollYProgress, [0.1, 0.75], [8, 0]);
+  const entryFilter = useTransform(entryBlur, (v) => `blur(${v}px)`);
+
   const [currentStep, setCurrentStep] = useState(0);
+  const [metrics, setMetrics] = useState({
+    blockedExecutions: 0,
+    successfulTxs: 0, // Allowed by validator
+    relayedTxs: 0     // Fully confirmed/mined on-chain
+  });
+
+  // Helper handlers to pass down the tree (memoized to prevent infinite update depth loops in children useEffects)
+  const incrementBlocked = useCallback(() => setMetrics(m => ({ ...m, blockedExecutions: m.blockedExecutions + 1 })), []);
+  const incrementSuccessful = useCallback(() => setMetrics(m => ({ ...m, successfulTxs: m.successfulTxs + 1 })), []);
+  const incrementRelayed = useCallback(() => setMetrics(m => ({ ...m, relayedTxs: m.relayedTxs + 1 })), []);
 
   // Synchronized step loop state machine
   // Step 0: User Intent (inputs enter side streams)
@@ -43,8 +68,9 @@ export default function SecuritySimulationSection() {
   
   return (
     <section 
+      ref={sectionRef}
       id="security-simulation" 
-      className="relative w-full py-28 bg-[#F4F4F4] overflow-hidden select-none"
+      className="relative w-full py-28 bg-guardian-obsidian overflow-hidden select-none z-20"
       aria-label="Security Simulation Panel"
     >
       
@@ -108,27 +134,27 @@ export default function SecuritySimulationSection() {
       </div>
 
       {/* Main container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 flex flex-col items-center gap-8">
+      <motion.div 
+        style={{
+          opacity: entryOpacity,
+          scale: entryScale,
+          y: entryY,
+          filter: entryFilter,
+        }}
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 flex flex-col items-center gap-8"
+      >
         
         {/* Editorial Header */}
-        <div className="w-full text-center max-w-3xl flex flex-col items-center select-none">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-[9px] tracking-[0.2em] font-mono text-[#050816]/60 uppercase font-semibold">
+        <div className="w-full text-center max-w-3xl flex flex-col items-center select-none mb-12">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-[9px] tracking-[0.25em] font-mono text-guardian-cyan uppercase font-bold">
               ZERO-TRUST EXECUTION SIMULATOR
             </span>
-            <div className="w-8 h-[1px] bg-[#050816]/20" />
           </div>
 
-          <h2 className="text-[2.2rem] sm:text-[3.2rem] lg:text-[3.6rem] font-extrabold leading-[0.9] tracking-tighter font-heading text-white select-none mb-6">
-            <span className="block">AI Can Act.</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400">
-              Rules Decide.
-            </span>
+          <h2 className="text-3xl sm:text-[40px] font-black font-heading text-white select-none leading-none tracking-tight">
+            AI Can Act. Rules Decide.
           </h2>
-          
-          <p className="text-slate-400 text-xs sm:text-sm max-w-xs sm:max-w-xl font-sans font-semibold leading-relaxed tracking-wide select-none">
-            DelegAI enforces cryptographic constraints before execution, preventing unsafe AI behavior while preserving autonomy. Watch how a live security context handles safe commands versus unauthorized transfers.
-          </p>
         </div>
 
         {/* Cinematic Split environment layout */}
@@ -136,34 +162,46 @@ export default function SecuritySimulationSection() {
           
           {/* LEFT SIDE: Safe execution path */}
           <div className="lg:col-span-4 flex w-full relative z-10">
-            <SafeScenario currentStep={currentStep} />
+            <SafeScenario 
+              currentStep={currentStep} 
+              incrementSuccessful={incrementSuccessful}
+              incrementRelayed={incrementRelayed}
+            />
           </div>
 
           {/* CENTER SECURITY CORE */}
           <div className="lg:col-span-3 flex flex-col items-center justify-center py-12 lg:py-0 relative min-h-[320px] z-20">
             
-            {/* Horizontal scanline connectors from side flows into Center Core (Active during scanning step 2) */}
-            <AnimatePresence>
-              {isScanning && (
-                <>
-                  {/* Left Validator to Core pulse */}
-                  <motion.div
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: 0.8 }}
-                    exit={{ opacity: 0 }}
-                    className="hidden lg:block absolute left-[-60px] w-[90px] h-[2px] bg-gradient-to-r from-slate-400 to-[#050816] origin-left z-0"
-                  />
-                  {/* Right Validator to Core pulse */}
-                  <motion.div
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: 0.8 }}
-                    exit={{ opacity: 0 }}
-                    className="hidden lg:block absolute right-[-60px] w-[90px] h-[2px] bg-gradient-to-l from-slate-400 to-[#050816] origin-right z-0"
-                  />
-                </>
-              )}
-            </AnimatePresence>
+            {/* Horizontal scanline connectors from side flows into Center Core */}
+            {/* Left permanent connector line */}
+            <div className="hidden lg:block absolute left-[-120px] w-[145px] h-[2px] bg-slate-800/10 border-t border-dashed border-guardian-slate/20 top-1/2 -translate-y-1/2 z-0" />
+            
+            {/* Safe Flowing Pulse */}
+            <motion.div
+              animate={{ x: [-120, 25] }}
+              transition={{
+                duration: isScanning ? 1.4 : 2.8,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+              className="hidden lg:block absolute w-1.5 h-1.5 rounded-full bg-guardian-cyan shadow-[0_0_8px_rgba(56,189,248,0.6)] top-1/2 -translate-y-1/2 z-10"
+            />
 
+            {/* Right permanent connector line */}
+            <div className="hidden lg:block absolute right-[-120px] w-[145px] h-[2px] bg-slate-800/10 border-t border-dashed border-guardian-slate/20 top-1/2 -translate-y-1/2 z-0" />
+            
+            {/* Unsafe Flowing Pulse (flows from right to center core) */}
+            <motion.div
+              animate={{ x: [145, 0] }}
+              style={{ right: 0 }}
+              transition={{
+                duration: isScanning ? 1.4 : 2.8,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+              className="hidden lg:block absolute w-1.5 h-1.5 rounded-full bg-slate-400 shadow-[0_0_8px_rgba(100,116,139,0.4)] top-1/2 -translate-y-1/2 z-10"
+            />
+ 
             {/* Core rotating rings & floating orb wrapper */}
             <div className="relative w-48 h-48 flex items-center justify-center">
               
@@ -172,34 +210,34 @@ export default function SecuritySimulationSection() {
                 animate={{
                   scale: [1, 1.08, 0.95, 1],
                   backgroundColor: currentStep < 3 
-                    ? 'rgba(5, 8, 22, 0.08)' 
+                    ? 'rgba(9, 10, 15, 0.2)' 
                     : isApproved 
-                    ? 'rgba(5, 8, 22, 0.1)' 
-                    : 'rgba(100, 116, 139, 0.1)',
+                    ? 'rgba(56, 189, 248, 0.15)' 
+                    : 'rgba(255, 0, 13, 0.15)',
                   boxShadow: currentStep < 3
-                    ? '0 0 60px 20px rgba(5, 8, 22, 0.15)'
+                    ? '0 0 60px 20px rgba(9, 10, 15, 0.3)'
                     : isApproved
-                    ? '0 0 60px 20px rgba(5, 8, 22, 0.25)'
-                    : '0 0 60px 20px rgba(100, 116, 139, 0.2)',
+                    ? '0 0 60px 20px rgba(56, 189, 248, 0.4)'
+                    : '0 0 60px 20px rgba(255, 0, 13, 0.4)',
                 }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute w-36 h-36 rounded-full blur-xl z-0 transition-all duration-500"
               />
-
+ 
               {/* Security Shield Ring 1 */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
-                className="absolute w-44 h-44 rounded-full border-2 border-dashed border-slate-800/20 z-10"
+                className="absolute w-44 h-44 rounded-full border-2 border-dashed border-guardian-slate/50 z-10"
               />
-
+ 
               {/* Security Shield Ring 2 */}
               <motion.div
                 animate={{ rotate: -360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute w-[150px] h-[150px] rounded-full border border-dashed border-slate-800/10 z-10"
+                className="absolute w-[150px] h-[150px] rounded-full border border-dashed border-guardian-slate/40 z-10"
               />
-
+ 
               {/* Dynamic core decision pulses */}
               <AnimatePresence>
                 {currentStep === 3 && (
@@ -209,24 +247,24 @@ export default function SecuritySimulationSection() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.5, ease: 'easeOut' }}
                     className={`absolute w-32 h-32 rounded-full border z-0 ${
-                      isApproved ? 'border-[#050816] bg-[#050816]/5' : 'border-slate-500 bg-slate-500/5'
+                      isApproved ? 'border-guardian-cyan bg-guardian-cyan/10' : 'border-guardian-crimson bg-guardian-crimson/10'
                     }`}
                   />
                 )}
               </AnimatePresence>
-
+ 
               {/* Center floating security core orb */}
               <motion.div
                 animate={{
                   y: [0, -6, 0],
                 }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative w-32 h-32 rounded-full bg-white border border-slate-800/10 shadow-md flex flex-col items-center justify-center p-4 z-20 text-center backdrop-blur-lg"
+                className="relative w-32 h-32 rounded-full bg-guardian-charcoal border border-guardian-slate/40 shadow-md flex flex-col items-center justify-center p-4 z-20 text-center backdrop-blur-lg"
               >
                 {/* Visual state icon inside orb */}
                 <div className="mb-2 shrink-0">
                   {currentStep < 2 && (
-                    <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-800/20 flex items-center justify-center text-[#050816]">
+                    <div className="w-5 h-5 rounded-full bg-guardian-slate border border-guardian-slate/50 flex items-center justify-center text-guardian-pearl">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
@@ -235,18 +273,18 @@ export default function SecuritySimulationSection() {
                   {isScanning && (
                     <div className="relative w-5 h-5 flex items-center justify-center">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-                      <div className="w-4 h-4 rounded-full border-2 border-slate-800 border-t-transparent animate-spin" />
+                      <div className="w-4 h-4 rounded-full border-2 border-guardian-slate border-t-transparent animate-spin" />
                     </div>
                   )}
                   {currentStep >= 3 && (
                     isApproved ? (
-                      <div className="w-5 h-5 rounded-full bg-[#050816] flex items-center justify-center text-white shadow-md shadow-slate-900/20">
+                      <div className="w-5 h-5 rounded-full bg-guardian-charcoal flex items-center justify-center text-white shadow-md shadow-black/40">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
                     ) : (
-                      <div className="w-5 h-5 rounded-full bg-slate-500 flex items-center justify-center text-white shadow-md shadow-slate-500/20 animate-bounce">
+                      <div className="w-5 h-5 rounded-full bg-guardian-crimson flex items-center justify-center text-white shadow-md shadow-guardian-crimson-glow animate-bounce">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -254,98 +292,38 @@ export default function SecuritySimulationSection() {
                     )
                   )}
                 </div>
-
-                <span className="text-[10px] font-black font-heading text-[#050816] tracking-wider leading-none uppercase">
+ 
+                <span className="text-[10px] font-black font-heading text-guardian-pearl tracking-wider leading-none uppercase">
                   BOUNDARIES
                 </span>
-                <span className="text-[7px] font-mono text-slate-400 font-bold leading-none mt-1 uppercase whitespace-nowrap">
+                <span className="text-[7px] font-mono text-guardian-ash font-bold leading-none mt-1 uppercase whitespace-nowrap">
                   Permission Core
                 </span>
               </motion.div>
-
+ 
               {/* Orbiting particles around the Core */}
               <motion.div
                 animate={{ rotate: -360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
                 className="absolute w-44 h-44 z-30 pointer-events-none"
               >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#050816] shadow-[0_0_8px_#050816]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-guardian-cyan shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
               </motion.div>
-
+ 
             </div>
           </div>
-
+ 
           {/* RIGHT SIDE: Unsafe threat path */}
           <div className="lg:col-span-4 flex w-full relative z-10">
-            <UnsafeScenario currentStep={currentStep} />
-          </div>
-
-        </div>
-
-        {/* Dynamic Timeline step indicators */}
-        <div className="flex items-center gap-2 mt-2">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                currentStep === idx
-                  ? 'w-8 bg-[#050816] shadow-[0_0_8px_rgba(5,8,22,0.4)]'
-                  : 'w-2.5 bg-slate-800/10'
-              }`}
+            <UnsafeScenario 
+              currentStep={currentStep} 
+              incrementBlocked={incrementBlocked}
             />
-          ))}
+          </div>
+ 
         </div>
 
-        {/* Centered Takeaway Footer (High-end Editorial style) */}
-        <div className="w-full max-w-4xl text-center border-t border-[#050816]/8 pt-6 mt-2 select-none">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
-            
-            <div className="flex flex-col md:items-center text-left md:text-center p-6 rounded-3xl bg-slate-950/[0.01] border border-slate-500/5 relative overflow-hidden transition-all duration-300 hover:bg-slate-950/[0.02]">
-              <div className="w-8 h-8 rounded-full bg-slate-500/10 text-slate-500 flex items-center justify-center mb-4 md:mx-auto">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h4 className="text-xs font-black font-heading text-slate-600 uppercase tracking-widest mb-2">
-                Without Constraints AI is Dangerous
-              </h4>
-              <p className="text-xs text-slate-400 font-sans font-semibold leading-relaxed max-w-sm">
-                AI automation operates without bounds, exposing assets to prompt injections, malicious outputs, and address hijacking.
-              </p>
-            </div>
-
-            <div className="flex flex-col md:items-center text-left md:text-center p-6 rounded-3xl bg-slate-950/[0.01] border border-slate-800/5 relative overflow-hidden transition-all duration-300 hover:bg-slate-950/[0.02]">
-              <div className="w-8 h-8 rounded-full bg-slate-900/10 text-[#050816] flex items-center justify-center mb-4 md:mx-auto">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" />
-                </svg>
-              </div>
-              <h4 className="text-xs font-black font-heading text-slate-800 uppercase tracking-widest mb-2">
-                With DelegAI Constraints AI becomes Useful
-              </h4>
-              <p className="text-xs text-slate-400 font-sans font-semibold leading-relaxed max-w-sm">
-                Sovereign automation operates safely inside cryptographic limits. Infractions are blocked at the signing level, guaranteeing complete custody shield.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Centered CTA Button to /guarding */}
-          <div className="flex justify-center mt-10 w-full relative z-10">
-            <Link href="/guarding" className="no-underline">
-              <motion.button
-                whileHover={{ backgroundColor: '#1e293b', scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                style={{ backgroundColor: '#050816', color: '#ffffff' }}
-                className="px-8 py-3.5 rounded-full font-heading font-extrabold text-xs tracking-widest uppercase transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-slate-950/15 cursor-pointer border-none outline-none text-center select-none"
-              >
-                Launch Shield Validator
-              </motion.button>
-            </Link>
-          </div>
-        </div>
-
-      </div>
+      </motion.div>
     </section>
   );
 }

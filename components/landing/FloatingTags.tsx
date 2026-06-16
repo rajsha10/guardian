@@ -4,9 +4,9 @@
 import { motion } from 'framer-motion';
 
 const TAGS = [
-  { label: 'AI AGENTS', glow: 'shadow-[0_0_15px_rgba(0,245,212,0.15)] border-primary-accent/15 hover:border-primary-accent/40' },
-  { label: 'SCOPED AUTHORITY', glow: 'shadow-[0_0_15px_rgba(5,8,22,0.05)] border-slate-800/20 hover:border-[#050816]/35' },
-  { label: 'ZERO CUSTODY', glow: 'shadow-[0_0_15px_rgba(0,245,212,0.1)] border-primary-accent/10 hover:border-primary-accent/30' },
+  { label: 'AI AGENTS', glow: 'shadow-[0_0_15px_rgba(0,245,212,0.15)] border-guardian-cyan/15 hover:border-guardian-cyan/40' },
+  { label: 'SCOPED AUTHORITY', glow: 'shadow-[0_0_15px_rgba(0,0,0,0.3)] border-guardian-slate/50 hover:border-guardian-cyan/40' },
+  { label: 'ZERO CUSTODY', glow: 'shadow-[0_0_15px_rgba(0,245,212,0.1)] border-guardian-cyan/10 hover:border-guardian-cyan/30' },
 ];
 
 export default function FloatingTags() {
@@ -31,7 +31,7 @@ export default function FloatingTags() {
               delay: 0.3 + idx * 0.1,
             }
           }}
-          className={`px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] font-mono text-[#050816]/70 backdrop-blur-xl bg-white/40 border transition-all duration-300 cursor-default select-none ${tag.glow}`}
+          className={`px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] font-mono text-guardian-pearl/70 backdrop-blur-xl bg-guardian-charcoal/40 border transition-all duration-300 cursor-default select-none ${tag.glow}`}
         >
           {tag.label}
         </motion.div>

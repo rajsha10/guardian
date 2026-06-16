@@ -35,8 +35,8 @@ export default function AmbientBackground({ activePanel = 0 }: AmbientBackground
         className="absolute inset-0 opacity-[0.03]" 
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(5, 8, 22, 0.5) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(5, 8, 22, 0.5) 1px, transparent 1px)
+            linear-gradient(to right, rgba(244, 244, 246, 0.15) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(244, 244, 246, 0.15) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px',
         }}
@@ -46,7 +46,7 @@ export default function AmbientBackground({ activePanel = 0 }: AmbientBackground
       <div 
         className="absolute inset-0 opacity-[0.04]" 
         style={{
-          backgroundImage: 'radial-gradient(#050816 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(244, 244, 246, 0.15) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }}
       />
@@ -86,7 +86,7 @@ export default function AmbientBackground({ activePanel = 0 }: AmbientBackground
       />
 
       {/* Ambient Glow Blob 3: White center light for depth */}
-      <div className="absolute top-[30%] left-[40%] w-[35vw] h-[35vw] rounded-full bg-white/40 blur-[140px] mix-blend-screen" />
+      <div className="absolute top-[30%] left-[40%] w-[35vw] h-[35vw] rounded-full bg-guardian-charcoal/40 blur-[140px] mix-blend-screen" />
 
       {/* Faint Floating Motion Particles */}
       {particles.map((p) => (

@@ -4,7 +4,7 @@ import SecuritySimulationSection from '@/components/landing/SecuritySimulationSe
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-[#F4F4F4]">
+    <main className="relative min-h-screen bg-guardian-obsidian">
       <HeroSection />
       <HowItWorksSection />
       <SecuritySimulationSection />

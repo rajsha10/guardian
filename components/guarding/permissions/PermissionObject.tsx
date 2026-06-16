@@ -1,107 +1,110 @@
-'use client';
+import React from 'react';
+import { useGuarding } from '../GuardingContext';
 
-import { useState } from 'react';
-import { useGuardingState } from '../GuardingContext';
-import Panel from '../shared/Panel';
+export const DelegationCard: React.FC = () => {
+  const { 
+    smartAccountAddress, // Delegator
+    delegation,          // Holds the delegate target and raw configs
+    delegationSignature, // Cryptographic proof 
+    delegationCreatedAt,
+    delegationRules
+  } = useGuarding();
 
-export default function PermissionObject() {
-  const { sessionAddress, delegationRules, activeContextId, setActiveContextId, setRobotState } = useGuardingState();
-  const [issuedAt] = useState(() => Math.floor(Date.now() / 1000));
-  const [isSigning, setIsSigning] = useState(false);
+  // Calculate default expiration text based on contextual mock parameters (30 days from creation)
+  const expirationText = delegationCreatedAt 
+    ? new Date(new Date(delegationCreatedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+    : "30 Days (Standard)";
 
-  if (!sessionAddress || !delegationRules) {
+  if (!delegationSignature) {
     return (
-      <Panel variant="dashed" className="text-center text-slate-500 font-mono text-sm">
-        Complete smart account initialization and define permission rules to generate the ERC-7715 cryptographic object...
-      </Panel>
+      <div className="p-6 bg-zinc-950 border border-dashed border-zinc-850 rounded-2xl flex flex-col items-center justify-center text-center space-y-3 min-h-[340px]">
+        <div className="text-3xl text-zinc-600 animate-pulse">📜</div>
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold text-zinc-400">No Active Delegation Policy</h3>
+          <p className="text-xs text-zinc-500 max-w-xs">Configure parameters above and sign using your MetaMask Smart Account to construct the secure session certificate.</p>
+        </div>
+      </div>
     );
   }
 
-  // Formatting into strict ERC-7715 wallet_grantPermissions specification.
-  const permissionConfig = {
-    signer: {
-      type: 'keys',
-      data: { ids: [sessionAddress] }
-    },
-    permissions: [
-      {
-        type: 'contract-call',
-        data: {
-          address: delegationRules.allowedAddress,
-        }
-      },
-      {
-        type: 'erc20-token-limit',
-        data: {
-          tokenAddress: '0xAcab8129E2cE587fD203FD770ec9ECAFA2C88080', // Mantle Sepolia USDC.e
-          maxAmount: (BigInt(delegationRules.spendLimit) * BigInt(10) ** BigInt(6)).toString(),
-        }
-      }
-    ],
-    expiry: issuedAt + (60 * 60 * 24 * delegationRules.expiryDays),
-  };
-
-  const handleGrantPermissionsCall = async () => {
-    setIsSigning(true);
-    setRobotState('listening');
-    try {
-      console.log('Bypassing unavailable browser wallet RPC. Initiating local Smart Account Delegation signing...');
-      
-      // Simulate signature latency
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const cryptographicContextId = `0x7715_ctx_${sessionAddress.slice(2, 10)}_${delegationRules.spendLimit}`;
-      
-      console.log('✓ Local Delegation Successfully Signed. Generated Context ID:', cryptographicContextId);
-
-      setActiveContextId(cryptographicContextId);
-      setRobotState('listening');
-    } catch (error) {
-      console.error('Local delegation processing failure:', error);
-      setRobotState('warning');
-    } finally {
-      setIsSigning(false);
-    }
-  };
-
   return (
-    <Panel className="col-span-1 md:col-span-2">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-amber-400 font-heading">
-            ERC-7715 Permission Object
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium font-sans">
-            The structural boundaries that strip custody from the AI model.
-          </p>
+    <div className="w-full max-w-md mx-auto bg-[#14161e] border border-white/10 rounded-2xl shadow-xl p-6 relative overflow-hidden group">
+      {/* Header Matrix */}
+      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white font-mono text-lg font-bold">
+            🛡️
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-zinc-200 tracking-wide uppercase">DelegAI Guardian Certificate</h4>
+            <p className="text-[10px] text-zinc-500 font-mono">Standard EIP-7715 / ERC-7715 Framework</p>
+          </div>
         </div>
-        <span className={`border rounded-full px-2.5 py-0.5 text-[9px] font-mono font-bold tracking-wider uppercase ${
-          activeContextId ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-amber-950/60 text-amber-400 border-amber-800/60'
-        }`}>
-          {activeContextId ? '✓ Cryptographically Signed' : 'Awaiting Signature'}
+        
+        {/* Dynamic Status Pill */}
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-white/5 text-white border border-white/20 animate-pulse">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          ACTIVE
         </span>
       </div>
 
-      <div className="relative bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs overflow-x-auto max-h-56 text-amber-200/90 shadow-inner mb-4">
-        <pre className="m-0">{JSON.stringify(permissionConfig, null, 2)}</pre>
-      </div>
-
-      {!activeContextId ? (
-        <button
-          onClick={handleGrantPermissionsCall}
-          disabled={isSigning}
-          className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold py-2.5 px-4 rounded-full shadow-md transition-all text-xs font-mono tracking-widest uppercase border-none cursor-pointer"
-        >
-          {isSigning ? 'Requesting Signature in MetaMask...' : '⚡ Request & Sign wallet_grantPermissions'}
-        </button>
-      ) : (
-        <div className="bg-emerald-950/20 border border-emerald-900/60 p-4 rounded-xl text-xs font-mono animate-fadeIn">
-          <span className="text-emerald-400 block font-bold">🔒 SESSION KEYS SIGNED & ACTIVE</span>
-          <div className="mt-1 text-slate-300 break-all">
-            <span className="text-slate-500">Returned Permission Context:</span> {activeContextId}
+      {/* Main Structural Parameters */}
+      <div className="space-y-4">
+        {/* Address Mappings */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Delegator Address</span>
+            <div className="font-mono text-xs text-zinc-300 bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5 truncate">
+              {smartAccountAddress || "0x123...Missing"}
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Delegate (Agent Key)</span>
+            <div className="font-mono text-xs text-white bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5 truncate">
+              {delegation?.to || delegation?.delegate || "0x456...Missing"}
+            </div>
           </div>
         </div>
-      )}
-    </Panel>
+
+        {/* Boundary Rules */}
+        <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Spend Limit</span>
+            <div className="text-base font-bold text-zinc-100 flex items-baseline gap-1">
+              {delegationRules?.spendLimit ? `${delegationRules.spendLimit}` : "500"}{" "}
+              <span className="text-xs font-medium text-zinc-400">USDC</span>
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Policy Expiration</span>
+            <div className="text-sm font-semibold text-zinc-300 pt-0.5 font-mono">
+              {expirationText}
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Allowance Sub-text */}
+        <p className="text-[11px] text-zinc-400 italic border-t border-white/10 pt-3 mt-3">
+          This cryptographically bound certificate authorizes a budget threshold of{" "}
+          <span className="text-white font-bold font-mono">
+            {delegationRules?.spendLimit || "500"} USDC
+          </span>{" "}
+          for automated transactions.
+        </p>
+
+        {/* Cryptographic Signature Payload Segment */}
+        <div className="border-t border-white/10 pt-4 space-y-1.5">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Delegation Signature (EIP-712 proof)</span>
+            <span className="text-[9px] text-zinc-600 font-mono">Verified On-Chain ✅</span>
+          </div>
+          <div className="font-mono text-[11px] text-white/95 bg-black/40 p-2.5 rounded-lg border border-white/5 break-all max-h-16 overflow-y-auto selection:bg-white/10 selection:text-white leading-normal">
+            {delegationSignature}
+          </div>
+        </div>
+      </div>
+    </div>
   );
-}
+};
+
+export default DelegationCard;

@@ -1,49 +1,62 @@
 // app/api/relay/route.ts
 import { NextResponse } from 'next/server';
+import { JsonRpcProvider, Wallet, Contract } from 'ethers';
 
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
 
-    // Verify structural integrity of the incoming transaction payload
-    if (!payload.to || !payload.data || payload.chainId !== 5003) {
-      return NextResponse.json({ error: 'Malformed payload container or invalid chain network target.' }, { status: 400 });
+    // Structural enforcement checks before hitting the chain
+    if (!payload.to || !payload.data || payload.chainId !== 11155111) {
+      return NextResponse.json({ error: 'Invalid transaction structure or network destination.' }, { status: 400 });
     }
 
-    console.log('Forwarding raw transaction bytes to 1Shot network gateway node...');
+    console.log('⚡ 1Shot Relayer: Ingesting verified payload bytes...');
+    console.log(`Targeting Contract Asset: ${payload.to}`);
 
-    // Live dispatch to the official 1Shot testnet developer endpoints
-    const response = await fetch('https://relayer.1shotapi.dev/relayers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ONESHOT_API_KEY || 'demo-token-for-hackathon'}`
-      },
-      body: JSON.stringify({
-        targetContract: payload.to,
-        value: payload.value.toString(),
-        calldata: payload.data,
-        chainId: payload.chainId,
-        executorContext: payload.sessionKeyContext,
-        sponsorType: 'PAYMASTER_SPONSORED' // Flags 1Shot to fully absorb the Mantle Sepolia gas fee
-      }),
+    // Initialize connectivity directly to Ethereum Sepolia Testnet
+    const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
+    
+    // HACKATHON RELAYER SIGNER: 
+    // In production, this private key belongs to the 1Shot gas sponsor wallet account loaded with testnet $ETH for gas fees.
+    const relayerPrivateKey = process.env.RELAYER_SPONSOR_PRIVATE_KEY;
+    
+    if (!relayerPrivateKey) {
+      throw new Error("Missing RELAYER_SPONSOR_PRIVATE_KEY in environment configuration.");
+    }
+
+    const relayerSigner = new Wallet(relayerPrivateKey, provider);
+
+    // Formulate the exact transactions container parameters
+    const txRequest = {
+      to: payload.to,
+      data: payload.data,
+      value: payload.value || 0,
+      gasLimit: 150000 // Fixed safe boundary limit for a standard ERC-20 transfer calldata block
+    };
+
+    console.log('🚀 Broadcasting transaction signature straight to Ethereum Sepolia node pool...');
+    
+    // Submit real, live transaction bytes to the blockchain network
+    const txResponse = await relayerSigner.sendTransaction(txRequest);
+    
+    console.log(`🎉 Transaction Broadcast Successful! Initial Tx Hash: ${txResponse.hash}`);
+
+    // Wait for exactly 1 block confirmation to guarantee incorporation
+    const receipt = await txResponse.wait(1);
+
+    return NextResponse.json({
+      success: true,
+      status: 'HASH_RECEIVED',
+      transactionHash: txResponse.hash,
+      blockNumber: receipt?.blockNumber
     });
 
-    // Fallback handler if the testnet relayer infrastructure endpoint is unreachable or down
-    if (!response.ok) {
-      console.warn('1Shot production gateway unreachable. Activating high-fidelity fallback simulation.');
-      return NextResponse.json({
-        success: true,
-        status: 'BROADCASTED',
-        transactionHash: `0x9c48ea92c68efb3b276701db54${Math.random().toString(16).slice(2, 10)}7e90c5d57b40974adbc3d893e3e7f`
-      });
-    }
-
-    const relayResult = await response.json();
-    return NextResponse.json(relayResult);
-
-  } catch (error) {
-    console.error('1Shot Relayer Endpoint Gateway Failure:', error);
-    return NextResponse.json({ error: 'Failed to process infrastructure relay execution' }, { status: 500 });
+  } catch (error: any) {
+    console.error('🔴 Live Chain Execution Failure:', error);
+    return NextResponse.json({ 
+      error: 'On-chain submission failed.', 
+      details: error.message || error 
+    }, { status: 500 });
   }
 }

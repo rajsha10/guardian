@@ -16,11 +16,11 @@ export default function Button({
   const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none disabled:opacity-60 disabled:pointer-events-none rounded-full cursor-pointer';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-semibold tracking-wide font-mono',
-    secondary: 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium',
-    outline: 'bg-transparent border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white',
-    ghost: 'bg-transparent hover:bg-slate-900/40 text-slate-400 hover:text-white border border-transparent',
-    circle: 'rounded-full aspect-square border border-slate-400 hover:border-primary-accent text-slate-100 hover:text-primary-accent bg-transparent hover:scale-105 transition-transform'
+    primary: 'bg-gradient-to-r from-guardian-cyan to-guardian-cyan/80 hover:from-guardian-cyan/90 hover:to-guardian-cyan text-guardian-obsidian font-semibold tracking-wide font-mono shadow-md hover:shadow-cyan-500/20',
+    secondary: 'bg-gradient-to-r from-guardian-platinum to-guardian-slate hover:from-guardian-slate hover:to-guardian-platinum text-guardian-pearl font-medium',
+    outline: 'bg-transparent border border-guardian-slate hover:border-guardian-platinum text-guardian-ash hover:text-guardian-pearl',
+    ghost: 'bg-transparent hover:bg-guardian-charcoal/40 text-guardian-ash hover:text-guardian-pearl border border-transparent',
+    circle: 'rounded-full aspect-square border border-guardian-slate hover:border-guardian-cyan text-guardian-pearl hover:text-guardian-cyan bg-transparent hover:scale-105 transition-transform'
   };
 
   const sizes = {

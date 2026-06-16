@@ -50,7 +50,7 @@ const Icons = {
 };
 
 export default function Sidebar() {
-  const { sidebarCollapsed, setSidebarCollapsed, smartAccount, sessionAddress } = useGuardingState();
+  const { sidebarCollapsed, setSidebarCollapsed, smartAccountAddress, sessionAddress } = useGuardingState();
 
   const handleToggle = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -60,27 +60,33 @@ export default function Sidebar() {
     <motion.aside
       animate={{ width: sidebarCollapsed ? 70 : 250 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="hidden md:flex flex-col h-screen border-r border-[#050816]/10 bg-slate-950 flex-shrink-0 select-none overflow-hidden relative z-30"
+      style={{
+        backgroundColor: 'rgba(20, 22, 30, 0.6)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRight: '0.5px solid var(--color-guardian-pearl)'
+      }}
+      className="hidden md:flex flex-col h-screen flex-shrink-0 select-none overflow-hidden relative z-30"
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-[#050816]/10">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-guardian-slate/40">
         {!sidebarCollapsed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex items-center gap-2"
           >
-            <div className="w-6 h-6 rounded-lg bg-[#050816] flex items-center justify-center text-primary-accent font-heading font-black text-sm shadow-[0_0_8px_rgba(0,245,212,0.3)]">
+            <div className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white font-heading font-black text-sm">
               G
             </div>
-            <span className="text-sm font-black font-heading tracking-tight text-[#050816] uppercase">
-              DelegAI Guardian
+            <span className="text-sm font-black font-heading tracking-tight text-white uppercase">
+              Guardian
             </span>
           </motion.div>
         )}
         {sidebarCollapsed && (
           <div className="w-full flex justify-center">
-            <div className="w-8 h-8 rounded-lg bg-[#050816] flex items-center justify-center text-primary-accent font-heading font-black text-lg shadow-[0_0_8px_rgba(0,245,212,0.3)]">
+            <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white font-heading font-black text-lg">
               G
             </div>
           </div>
@@ -102,7 +108,7 @@ export default function Sidebar() {
           label="Permission Caveats" 
           icon={Icons.Permissions} 
           collapsed={sidebarCollapsed} 
-          badge={smartAccount ? 'Active' : null}
+          badge={smartAccountAddress ? 'Active' : null}
         />
         <NavItem 
           href="/guarding/sessions" 
@@ -138,10 +144,10 @@ export default function Sidebar() {
       </div>
 
       {/* Footer / Toggle Button */}
-      <div className="p-3 border-t border-[#050816]/10 flex items-center justify-center">
+      <div className="p-3 border-t border-guardian-slate/40 flex items-center justify-center">
         <button
           onClick={handleToggle}
-          className="w-full py-2 hover:bg-[#050816]/5 rounded-xl border border-transparent hover:border-[#050816]/10 text-slate-500 hover:text-[#050816] flex items-center justify-center transition-all cursor-pointer"
+          className="w-full py-2 hover:bg-guardian-charcoal/40 rounded-xl border border-transparent hover:border-guardian-slate/40 text-guardian-ash hover:text-guardian-pearl flex items-center justify-center transition-all cursor-pointer"
         >
           {sidebarCollapsed ? Icons.DoubleArrowRight : Icons.DoubleArrowLeft}
         </button>

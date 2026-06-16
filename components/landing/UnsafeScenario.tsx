@@ -1,14 +1,21 @@
 // components/landing/UnsafeScenario.tsx
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedNodes from './AnimatedNodes';
 
 interface UnsafeScenarioProps {
   currentStep: number;
+  incrementBlocked?: () => void;
 }
 
-export default function UnsafeScenario({ currentStep }: UnsafeScenarioProps) {
+export default function UnsafeScenario({ currentStep, incrementBlocked }: UnsafeScenarioProps) {
+  useEffect(() => {
+    if (currentStep === 3) {
+      incrementBlocked?.();
+    }
+  }, [currentStep, incrementBlocked]);
   const isAlarmState = currentStep >= 2;
 
   return (
@@ -22,73 +29,26 @@ export default function UnsafeScenario({ currentStep }: UnsafeScenarioProps) {
       }`} />
 
       {/* Strong Unsafe Header Label */}
-      <div className="flex flex-col items-start gap-1 relative z-10 border-b border-[#050816]/5 pb-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-3.5 w-3.5 shrink-0">
+      <div className="flex flex-col items-start gap-1 relative z-10 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-2 w-2 shrink-0">
             {isAlarmState && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-guardian-crimson opacity-75"></span>
             )}
-            <span className={`relative inline-flex rounded-full h-3.5 w-3.5 transition-all duration-300 ${
-              isAlarmState ? 'bg-slate-500 shadow-[0_0_8px_rgba(100,116,139,0.8)]' : 'bg-slate-400'
+            <span className={`relative inline-flex rounded-full h-2 w-2 transition-all duration-300 ${
+              isAlarmState ? 'bg-guardian-crimson shadow-[0_0_8px_rgba(255,0,13,0.8)]' : 'bg-guardian-ash'
             }`}></span>
           </div>
-          <h3 className="text-2xl font-extrabold font-heading text-[#050816] uppercase tracking-wide leading-none">
+          <h3 className="text-sm font-bold font-heading text-guardian-pearl uppercase tracking-wider leading-none">
             UNSAFE EXECUTION
           </h3>
         </div>
-        <p className="text-[10px] md:text-xs text-slate-400 font-mono font-bold uppercase tracking-widest mt-1">
-          Cryptographic Constraints Bypass Attempt
-        </p>
       </div>
 
       {/* Unstable Flowing Vertical Nodes */}
       <div className="relative z-10 w-full pl-2">
         <AnimatedNodes isSafe={false} currentStep={currentStep} />
       </div>
-
-      {/* Floating Hologram Assistant (Threat Monitor) */}
-      <motion.div
-        animate={isAlarmState ? {
-          x: [0, -1, 1, -1, 1, 0],
-          y: [0, -6, 2, -4, 0],
-        } : {
-          y: [0, -6, 0],
-        }}
-        transition={isAlarmState ? {
-          duration: 0.5,
-          repeat: Infinity,
-          repeatType: 'reverse' as const,
-        } : {
-          duration: 5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        className={`absolute bottom-6 right-6 z-20 pointer-events-none hidden md:flex items-center gap-3 border px-3.5 py-2.5 rounded-2xl backdrop-blur-md shadow-sm transition-all duration-300 ${
-          isAlarmState 
-            ? 'bg-slate-50/20 border-slate-500/35' 
-            : 'bg-white/40 border-slate-500/15'
-        }`}
-      >
-        <div className={`w-6 h-6 rounded-xl flex items-center justify-center border shrink-0 transition-colors duration-300 ${
-          isAlarmState 
-            ? 'bg-slate-500/20 border-slate-500/30' 
-            : 'bg-slate-500/5 border-slate-500/10'
-        }`}>
-          <svg className={`w-3.5 h-3.5 ${isAlarmState ? 'text-slate-500' : 'text-slate-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-[7px] font-black font-mono tracking-widest text-[#050816]/50 uppercase leading-none">
-            INTRUSION WATCH
-          </span>
-          <span className={`text-[9px] font-mono font-bold mt-0.5 leading-none transition-colors duration-300 ${
-            isAlarmState ? 'text-slate-500' : 'text-slate-400'
-          }`}>
-            {isAlarmState ? 'VIOLATION INSULATED' : 'SHIELD STATUS: OK'}
-          </span>
-        </div>
-      </motion.div>
 
     </div>
   );

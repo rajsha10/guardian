@@ -47,7 +47,7 @@ export default function StoryPanel({
           initial={{ opacity: 0, y: 30 }}
           animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-3xl sm:text-4xl md:text-5xl font-black font-heading leading-[0.95] tracking-tighter text-[#050816] mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl font-black font-heading leading-[0.95] tracking-tighter text-guardian-pearl mb-4"
         >
           {headingLines.map((line, idx) => (
             <span key={idx} className="block">
@@ -61,7 +61,7 @@ export default function StoryPanel({
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="text-xs sm:text-sm text-slate-400 font-sans font-semibold leading-relaxed tracking-wide max-w-lg mb-6"
+          className="text-xs sm:text-sm text-guardian-ash font-sans font-semibold leading-relaxed tracking-wide max-w-lg mb-6"
         >
           {description}
         </motion.p>
@@ -77,7 +77,7 @@ export default function StoryPanel({
             {labels.map((lbl) => (
               <span
                 key={lbl}
-                className="text-[9px] font-bold tracking-[0.12em] bg-slate-900 border border-slate-800/20 text-[#050816]/75 px-3 py-1 rounded-full shadow-sm"
+                className="text-[9px] font-bold tracking-[0.12em] bg-slate-900 border border-guardian-slate/50 text-guardian-pearl/75 px-3 py-1 rounded-full shadow-sm"
               >
                 {lbl}
               </span>

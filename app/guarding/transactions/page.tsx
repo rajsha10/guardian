@@ -4,8 +4,11 @@
 import SectionHeader from '@/components/guarding/shared/SectionHeader';
 import TransactionBuilder from '@/components/guarding/transactions/TransactionBuilder';
 import RelayerBroadcast from '@/components/guarding/transactions/RelayerBroadcast';
+import { useGuardingState } from '@/components/guarding/GuardingContext';
 
 export default function TransactionsPage() {
+  const { relayReadyPayload, incrementRelayed } = useGuardingState();
+
   return (
     <div className="space-y-6">
       <SectionHeader 
@@ -15,7 +18,10 @@ export default function TransactionsPage() {
 
       <div className="grid grid-cols-1 gap-8">
         <TransactionBuilder />
-        <RelayerBroadcast />
+        <RelayerBroadcast 
+          relayReadyPayload={relayReadyPayload} 
+          onRelayConfirmed={incrementRelayed}
+        />
       </div>
     </div>
   );

@@ -12,35 +12,35 @@ const PANEL_STATES = [
     id: 0,
     status: 'AI GUARD: ACTIVE',
     glowColor: 'var(--color-amber-950)', // Teal Glow
-    badgeBg: 'bg-slate-900 text-primary-accent border-primary-accent/20',
+    badgeBg: 'bg-slate-900 text-guardian-cyan border-guardian-cyan/20',
     description: 'Scoping local session authority...',
   },
   {
     id: 1,
     status: 'SESSION BOUNDARIES: LOCKED',
     glowColor: 'var(--color-indigo-950)', // Purple Glow
-    badgeBg: 'bg-slate-900 text-[#050816]/60 border-slate-800/20',
+    badgeBg: 'bg-slate-900 text-guardian-ash border-guardian-slate/50',
     description: 'Cryptographic limits defined',
   },
   {
     id: 2,
     status: 'INTENT PARSER: RESOLVED',
     glowColor: 'var(--color-amber-950)', // Cyan/Teal Glow
-    badgeBg: 'bg-slate-900 text-primary-accent border-primary-accent/20',
+    badgeBg: 'bg-slate-900 text-guardian-cyan border-guardian-cyan/20',
     description: 'Converting prompts to parameters',
   },
   {
     id: 3,
     status: 'SHIELD VALIDATOR: VERIFIED',
     glowColor: 'var(--color-emerald-950)', // Green Glow
-    badgeBg: 'bg-slate-900 text-primary-accent border-primary-accent/20',
+    badgeBg: 'bg-slate-900 text-guardian-cyan border-guardian-cyan/20',
     description: 'Sanitized transaction payloads',
   },
   {
     id: 4,
     status: 'RELAY ROUTER: READY',
     glowColor: 'var(--color-indigo-950)', // Purple/Mixed Glow
-    badgeBg: 'bg-slate-900 text-primary-accent border-primary-accent/20',
+    badgeBg: 'bg-slate-900 text-guardian-cyan border-guardian-cyan/20',
     description: 'Gasless broadcast pipeline active',
   },
 ];
@@ -68,10 +68,10 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
       />
 
       {/* 2. Soft circular base grid behind robot */}
-      <div className="absolute w-60 h-60 rounded-full border border-[#050816]/5 bg-white/10 backdrop-blur-[2px] shadow-inner z-0 flex items-center justify-center">
+      <div className="absolute w-60 h-60 rounded-full border border-guardian-slate/20 bg-guardian-charcoal/10 backdrop-blur-[2px] shadow-inner z-0 flex items-center justify-center">
         {/* Faint target lines */}
-        <div className="absolute w-[90%] h-[90%] rounded-full border border-dashed border-[#050816]/5" />
-        <div className="absolute w-[60%] h-[60%] rounded-full border border-dotted border-[#050816]/5" />
+        <div className="absolute w-[90%] h-[90%] rounded-full border border-dashed border-guardian-slate/20" />
+        <div className="absolute w-[60%] h-[60%] rounded-full border border-dotted border-guardian-slate/20" />
       </div>
 
       {/* 3. 3D Orbital Rings (Tilted rings with orbiting beads) */}
@@ -81,7 +81,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
         style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
       >
         <motion.div
-          className="relative w-full h-full rounded-full border border-primary-accent/25 border-dashed"
+          className="relative w-full h-full rounded-full border border-guardian-cyan/25 border-dashed"
           style={{
             transform: 'rotateX(72deg) rotateY(12deg)',
             transformStyle: 'preserve-3d',
@@ -90,7 +90,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
           transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
         >
           {/* Glowing Bead */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary-accent shadow-[0_0_8px_var(--color-primary-accent)]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-guardian-cyan shadow-[0_0_8px_var(--color-primary-accent)]" />
         </motion.div>
       </div>
 
@@ -100,7 +100,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
         style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
       >
         <motion.div
-          className="relative w-full h-full rounded-full border border-[#050816]/10"
+          className="relative w-full h-full rounded-full border border-guardian-slate/40"
           style={{
             transform: 'rotateX(68deg) rotateY(-18deg)',
             transformStyle: 'preserve-3d',
@@ -109,7 +109,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
           transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
         >
           {/* Glowing Bead */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rounded-full bg-primary-accent shadow-[0_0_8px_var(--color-primary-accent)]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rounded-full bg-guardian-cyan shadow-[0_0_8px_var(--color-primary-accent)]" />
         </motion.div>
       </div>
 
@@ -117,7 +117,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
       {Array.from({ length: 6 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1.5 h-1.5 rounded-full bg-primary-accent/30"
+          className="absolute w-1.5 h-1.5 rounded-full bg-guardian-cyan/30"
           initial={{ y: 80, x: Math.random() * 80 - 40, opacity: 0 }}
           animate={{
             y: [-20, -100],
@@ -163,7 +163,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="absolute -top-4 w-12 h-1 rounded-full bg-primary-accent/40 blur-[2px] filter drop-shadow-[0_0_4px_var(--color-primary-accent)]"
+          className="absolute -top-4 w-12 h-1 rounded-full bg-guardian-cyan/40 blur-[2px] filter drop-shadow-[0_0_4px_var(--color-primary-accent)]"
         />
       </motion.div>
 
@@ -189,7 +189,7 @@ export default function PersistentRobot({ activePanel }: PersistentRobotProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="text-[10px] text-slate-500 font-sans font-medium"
+            className="text-[10px] text-guardian-ash font-sans font-medium"
           >
             {currentState.description}
           </motion.span>

@@ -3,7 +3,7 @@
 
 import SectionHeader from '@/components/guarding/shared/SectionHeader';
 import DelegationForm from '@/components/guarding/permissions/DelegationForm';
-import PermissionObject from '@/components/guarding/permissions/PermissionObject';
+import DelegationCard from '@/components/guarding/permissions/PermissionObject';
 
 export default function PermissionsPage() {
   return (
@@ -15,7 +15,7 @@ export default function PermissionsPage() {
 
       <div className="grid grid-cols-1 gap-8">
         <DelegationForm />
-        <PermissionObject />
+        <DelegationCard />
       </div>
     </div>
   );

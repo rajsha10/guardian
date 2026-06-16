@@ -148,7 +148,7 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
             animate={{
               height: `${(Math.min(currentStep, 5) / 5) * 100}%`,
             }}
-            className="w-full bg-[#050816]"
+            className="w-full bg-guardian-cyan"
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         ) : (
@@ -176,7 +176,7 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
             exit={{ opacity: 0 }}
-            className="absolute left-[24px] w-2 h-2 rounded-full bg-[#050816] shadow-[0_0_10px_#050816] z-10 -translate-x-1/2"
+            className="absolute left-[24px] w-2 h-2 rounded-full bg-guardian-cyan shadow-[0_0_10px_rgba(56,189,248,0.4)] z-10 -translate-x-1/2"
             style={{
               top: `${16 + (currentStep - 1) * 16}%`, // Interpolates progress
             }}
@@ -206,20 +206,20 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
           const isCompleted = currentStep > node.id;
           const isFailed = !isSafe && node.id >= 3 && currentStep >= 3;
           
-          let borderClass = 'border-slate-800/10 bg-white';
-          let iconColor = 'text-slate-300';
+          let borderClass = 'border-guardian-slate/40 bg-guardian-charcoal';
+          let iconColor = 'text-guardian-ash/90';
           let glowColor = '';
           
           if (isActive) {
-            borderClass = isSafe ? 'border-[#050816] bg-white' : 'border-slate-400 bg-white';
-            iconColor = isSafe ? 'text-[#050816]' : 'text-slate-500 animate-pulse';
-            glowColor = isSafe ? 'shadow-[0_0_12px_rgba(5,8,22,0.15)]' : 'shadow-[0_0_12px_rgba(5,8,22,0.08)]';
+            borderClass = isSafe ? 'border-guardian-cyan bg-guardian-charcoal' : 'border-guardian-crimson bg-guardian-charcoal';
+            iconColor = isSafe ? 'text-guardian-cyan' : 'text-guardian-crimson animate-pulse';
+            glowColor = isSafe ? 'shadow-[0_0_12px_rgba(56,189,248,0.25)]' : 'shadow-[0_0_12px_rgba(255,0,13,0.15)]';
           } else if (isCompleted && !isFailed) {
-            borderClass = isSafe ? 'border-[#050816] bg-[#050816]' : 'border-slate-400 bg-slate-400';
-            iconColor = 'text-white font-bold';
+            borderClass = isSafe ? 'border-guardian-cyan bg-guardian-cyan' : 'border-guardian-crimson bg-guardian-crimson';
+            iconColor = 'text-guardian-obsidian font-bold';
           } else if (isFailed) {
-            borderClass = 'border-slate-800/5 bg-[#F4F4F4] opacity-40';
-            iconColor = 'text-slate-300';
+            borderClass = 'border-guardian-slate/20 bg-guardian-obsidian opacity-40';
+            iconColor = 'text-guardian-ash/90';
           }
 
           // Trigger collision feedback at node 2 (Validator) in unsafe path at step 3
@@ -236,7 +236,7 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
                   <motion.div
                     layoutId={isSafe ? 'safe-wave' : 'unsafe-wave'}
                     className={`absolute w-14 h-14 rounded-full border ${
-                      isSafe ? 'border-[#050816]/20 bg-[#050816]/5' : 'border-slate-400/20 bg-slate-400/5'
+                      isSafe ? 'border-guardian-slate/60 bg-guardian-charcoal/40' : 'border-slate-400/20 bg-slate-400/5'
                     } z-0`}
                     animate={{ scale: [1, 1.3, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
@@ -249,7 +249,7 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
                     initial={{ scale: 1, opacity: 0.8 }}
                     animate={{ scale: [1, 2.2, 1], opacity: [0.8, 0, 0.8] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
-                    className="absolute w-14 h-14 rounded-full bg-slate-500/10 z-0 border border-slate-400/40"
+                    className="absolute w-14 h-14 rounded-full bg-guardian-obsidian0/10 z-0 border border-slate-400/40"
                   />
                 )}
 
@@ -257,8 +257,8 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
                 <motion.div
                   animate={{
                     scale: isActive ? 1.08 : 1,
-                    borderColor: isCollision ? '#64748B' : undefined,
-                    backgroundColor: isCollision ? '#F1F5F9' : undefined,
+                    borderColor: isCollision ? 'var(--color-guardian-crimson)' : undefined,
+                    backgroundColor: isCollision ? 'var(--color-guardian-charcoal)' : undefined,
                   }}
                   className={`w-10 h-10 md:w-11 md:h-11 rounded-full border-2 flex items-center justify-center shrink-0 z-10 transition-all duration-300 ${borderClass} ${glowColor}`}
                 >
@@ -275,14 +275,14 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
               }`}>
                 <h4 className={`text-xs md:text-sm font-extrabold font-heading tracking-tight ${
                   isActive
-                    ? isSafe ? 'text-[#050816]' : 'text-slate-600'
+                    ? isSafe ? 'text-guardian-cyan' : 'text-guardian-crimson'
                     : isCompleted && !isFailed
-                    ? 'text-[#050816]/75 font-bold'
-                    : 'text-slate-400'
+                    ? 'text-guardian-pearl/75 font-bold'
+                    : 'text-guardian-ash'
                 }`}>
                   {node.title}
                 </h4>
-                <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-0.5 max-w-[180px] md:max-w-xs truncate">
+                <p className="text-[10px] md:text-xs text-guardian-ash font-mono mt-0.5 max-w-[180px] md:max-w-xs truncate">
                   {node.subtitle}
                 </p>
               </div>
@@ -295,7 +295,7 @@ export default function AnimatedNodes({ isSafe, currentStep }: AnimatedNodesProp
                     animate={{ opacity: 1, x: 0 }}
                     className={`absolute right-[-40px] md:right-[-60px] top-1/2 -translate-y-1/2 text-[7px] font-mono font-bold tracking-widest px-2 py-0.5 rounded border ${
                       isSafe
-                        ? 'bg-slate-950/5 text-[#050816] border-[#050816]/20'
+                        ? 'bg-guardian-cyan/15 text-guardian-cyan border-guardian-cyan/30'
                         : 'bg-slate-950/5 text-slate-600 border-slate-500/20'
                     }`}
                   >

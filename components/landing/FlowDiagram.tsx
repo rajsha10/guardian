@@ -9,11 +9,11 @@ interface FlowDiagramProps {
 }
 
 const NODES = [
-  { id: 'req', label: 'AI Request', icon: '🤖', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-primary-accent/40' },
-  { id: 'val', label: 'Validator Check', icon: '🛡️', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-primary-accent/40' },
-  { id: 'bld', label: 'Tx Builder', icon: '⚙️', glow: 'shadow-[0_0_12px_rgba(5,8,22,0.15)] border-[#050816]/20' },
-  { id: 'rly', label: 'Gasless Relay', icon: '⚡', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-primary-accent/40' },
-  { id: 'chn', label: 'On-Chain Execution', icon: '⛓️', glow: 'shadow-[0_0_18px_var(--color-primary-accent)] border-primary-accent/50' },
+  { id: 'req', label: 'AI Request', icon: '🤖', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-guardian-cyan/40' },
+  { id: 'val', label: 'Validator Check', icon: '🛡️', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-guardian-cyan/40' },
+  { id: 'bld', label: 'Tx Builder', icon: '⚙️', glow: 'shadow-[0_0_12px_rgba(56,189,248,0.25)] border-guardian-slate/60' },
+  { id: 'rly', label: 'Gasless Relay', icon: '⚡', glow: 'shadow-[0_0_12px_var(--color-primary-accent)] border-guardian-cyan/40' },
+  { id: 'chn', label: 'On-Chain Execution', icon: '⛓️', glow: 'shadow-[0_0_18px_var(--color-primary-accent)] border-guardian-cyan/50' },
 ];
 
 export default function FlowDiagram({ isActive }: FlowDiagramProps) {
@@ -58,8 +58,8 @@ export default function FlowDiagram({ isActive }: FlowDiagramProps) {
                 }}
                 className={`relative px-4 py-2.5 rounded-xl border flex items-center gap-3.5 z-10 w-full transition-all duration-500 backdrop-blur-md ${
                   node.id === 'chn' && isGlowing
-                    ? 'bg-slate-50 border-primary-accent/40 text-white shadow-[0_0_18px_rgba(0,245,212,0.3)]'
-                    : `bg-slate-900 border-slate-800/10 text-[#050816]/75 shadow-sm ${isGlowing ? node.glow : ''}`
+                    ? 'bg-guardian-obsidian border-guardian-cyan/40 text-white shadow-[0_0_18px_rgba(0,245,212,0.3)]'
+                    : `bg-slate-900 border-guardian-slate/40 text-guardian-pearl/75 shadow-sm ${isGlowing ? node.glow : ''}`
                 }`}
               >
                 <span className="text-sm shrink-0">{node.icon}</span>
@@ -69,14 +69,14 @@ export default function FlowDiagram({ isActive }: FlowDiagramProps) {
 
                 {/* Ring Indicator */}
                 {isGlowing && (
-                  <span className="absolute -inset-[2px] rounded-xl border border-primary-accent/20 animate-ping opacity-60 pointer-events-none" />
+                  <span className="absolute -inset-[2px] rounded-xl border border-guardian-cyan/20 animate-ping opacity-60 pointer-events-none" />
                 )}
               </motion.div>
 
               {/* Connecting vertical path indicator */}
               {index < NODES.length - 1 && (
                 <div className="h-6 w-full relative flex items-center justify-center">
-                  <div className="absolute top-0 bottom-0 w-[2px] bg-[#050816]/10" />
+                  <div className="absolute top-0 bottom-0 w-[2px] bg-guardian-slate/20" />
                   
                   <svg className="w-4 h-full relative z-10" viewBox="0 0 16 24" fill="none">
                     {pulseIndex === index && (
@@ -105,12 +105,12 @@ export default function FlowDiagram({ isActive }: FlowDiagramProps) {
         transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
         className="flex flex-col items-center justify-center text-center mt-6 select-none"
       >
-        <div className="text-xl font-black font-heading leading-none tracking-tighter text-[#050816] flex flex-col gap-1">
+        <div className="text-xl font-black font-heading leading-none tracking-tighter text-guardian-pearl flex flex-col gap-1">
           <span className="relative pb-0.5">
             AI got autonomy.
             <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary-accent to-transparent opacity-85" />
           </span>
-          <span className="text-slate-400 mt-1.5 font-medium text-sm tracking-normal">
+          <span className="text-guardian-ash mt-1.5 font-medium text-sm tracking-normal">
             Users kept control.
           </span>
         </div>

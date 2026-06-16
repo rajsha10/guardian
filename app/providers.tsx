@@ -5,15 +5,15 @@ import { createConfig, http, WagmiProvider } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode, useState } from 'react';
-import { mantleSepolia } from '@/lib/chains';
+import { targetChain } from '@/lib/chains';
 
 export const config = createConfig({
-  chains: [mantleSepolia],
+  chains: [targetChain],
   connectors: [
     injected({ target: 'metaMask' })
   ],
   transports: {
-    [mantleSepolia.id]: http(), 
+    [targetChain.id]: http(process.env.NEXT_PUBLIC_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com'), 
   },
 });
 

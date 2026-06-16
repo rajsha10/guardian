@@ -1,80 +1,248 @@
 'use client';
 
-import HeroContent from './HeroContent';
-import HeroVisual from './HeroVisual';
-import HeroSidebar from './HeroSidebar';
+import { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import Link from 'next/link';
+import FrameSequenceBackground from './FrameSequenceBackground';
+
+interface FeatureCardProps {
+  number: string;
+  title: string;
+  description: string;
+  titleClassName?: string;
+  hoverBorderClassName?: string;
+  isLit?: boolean;
+  glowDirection?: 'bottom-right' | 'bottom-left';
+}
+
+function FeatureCard({
+  number,
+  title,
+  description,
+  titleClassName = 'text-slate-100',
+  hoverBorderClassName = 'hover:border-guardian-cyan/40',
+  isLit = false,
+  glowDirection = 'bottom-right',
+}: FeatureCardProps) {
+  // Split number and category label
+  const hasSplit = number.includes(' / ');
+  const numOnly = hasSplit ? number.split(' / ')[0] : number;
+  const category = hasSplit ? number.split(' / ')[1] : '';
+
+  // Glow styles mapping
+  const borderStyle = isLit
+    ? (hoverBorderClassName.includes('#38bdf8')
+        ? 'border-[#38bdf8]/60 shadow-[0_0_20px_rgba(56,189,248,0.25)]'
+        : 'border-guardian-cyan/60 shadow-[0_0_20px_rgba(56,189,248,0.25)]')
+    : 'border-guardian-slate/40';
+
+  const gradientOpacity = isLit 
+    ? 'opacity-100' 
+    : 'opacity-60 group-hover:opacity-85';
+
+  // Glow gradient direction (Left cards glow bottom-right, Right cards glow bottom-left)
+  const glowGradient = glowDirection === 'bottom-right'
+    ? 'bg-gradient-to-tl from-guardian-crimson/15 via-transparent to-transparent'
+    : 'bg-gradient-to-tr from-guardian-crimson/15 via-transparent to-transparent';
+
+  const floatDelay = numOnly === '01' ? 0 : numOnly === '02' ? 1.2 : numOnly === '03' ? 2.4 : 3.6;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full h-auto lg:h-[180px] select-none"
+    >
+      <motion.div
+        animate={{
+          y: [0, -6, 0],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: floatDelay,
+        }}
+        className={`relative group overflow-hidden bg-guardian-charcoal/50 border backdrop-blur-md rounded-xl p-6 transition-all duration-500 shadow-lg h-full w-full flex flex-col justify-between ${borderStyle} ${hoverBorderClassName}`}
+      >
+        {/* Background Gradient Glow */}
+        <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${glowGradient} ${gradientOpacity}`} />
+        
+        {/* Content Wrapper */}
+        <div className="relative z-10 flex flex-col justify-between h-full w-full">
+          {/* Top Row: Large Red Number */}
+          <div>
+            <span className={`text-[22px] font-black font-mono leading-none transition-colors duration-500 ${isLit ? 'text-guardian-cyan' : 'text-guardian-crimson'}`}>
+              {numOnly}
+            </span>
+          </div>
+          
+          {/* Bottom Row: Inline Text Content */}
+          <div className="mt-8 text-left">
+            {category && (
+              <span className={`text-[9px] font-bold font-mono tracking-widest uppercase transition-colors duration-500 mb-1.5 block ${isLit ? 'text-guardian-cyan/90' : 'text-guardian-ash/60'}`}>
+                {category}
+              </span>
+            )}
+            <p className={`text-[11px] font-semibold font-sans leading-relaxed tracking-wide transition-colors duration-500 ${isLit ? 'text-guardian-pearl' : 'text-guardian-ash'}`}>
+              <span className={`font-extrabold font-heading transition-all duration-500 mr-2 ${isLit ? 'text-white' : titleClassName}`}>
+                {title}
+              </span>
+              {description}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export default function HeroSection() {
+  const [activeGlowCard, setActiveGlowCard] = useState<number | null>(null);
+  const [isPastHero, setIsPastHero] = useState(false);
+
+  // Track page scroll to drive exit scale and opacity animations
+  const { scrollY } = useScroll();
+
+  // Transform scale, translation, blur and opacity dynamically as the page scrolls down
+  const scale = useTransform(scrollY, [0, 450], [1, 0.92]);
+  const opacity = useTransform(scrollY, [0, 380], [1, 0]);
+  const y = useTransform(scrollY, [0, 450], [0, -100]);
+  const blurValue = useTransform(scrollY, [0, 350], [0, 12]);
+  const filter = useTransform(blurValue, (v) => `blur(${v}px)`);
+
+  useEffect(() => {
+    // Reset scroll positions on mount to guarantee landing at the exact top
+    window.scrollTo(0, 0);
+
+    const handleScroll = () => {
+      setIsPastHero(window.scrollY > window.innerHeight);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleFrameChange = (frameIndex: number) => {
+    // 234 frames total. Map them to cards:
+    // Card 01 (Autonomous Autonomy): frames 0 to 58
+    // Card 02 (Professional Infrastructure): frames 59 to 117
+    // Card 03 (Instant Zero-Gas Execution): frames 118 to 175
+    // Card 04 (Trust Boundary Enforcement): frames 176 to 233
+    const cardIndex = Math.floor(frameIndex / 58.5) + 1; // 1, 2, 3, or 4
+    setActiveGlowCard(cardIndex);
+  };
+
   return (
-    <div className="relative w-full min-h-screen bg-slate-950 flex flex-col justify-between overflow-hidden select-none">
-      {/* Background Ambient Glows - Left purple, right teal, center dark */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Left subtle purple glow */}
-        <div className="absolute top-[15%] left-[-15%] w-[60vw] h-[60vw] max-w-[700px] rounded-full bg-secondary-accent/10 blur-[140px] mix-blend-screen" />
-        {/* Right subtle teal glow */}
-        <div className="absolute bottom-[10%] right-[-15%] w-[60vw] h-[60vw] max-w-[700px] rounded-full bg-primary-accent/8 blur-[140px] mix-blend-screen" />
-      </div>
-
-      {/* Main Grid Content Container */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0 items-center justify-between px-6 sm:px-12 lg:px-24 flex-grow w-full max-w-7xl mx-auto py-6">
-        {/* Left Column: Heading & Paragraph & CTA (width aligned to reference) */}
-        <div className="lg:col-span-5 flex flex-col justify-center w-full z-10">
-          <HeroContent />
+    <div className="relative w-full h-screen bg-transparent z-10">
+      {/* Fixed viewport container that fades out as a whole on scroll */}
+      <motion.div 
+        style={{ opacity, display: isPastHero ? 'none' : 'flex' }}
+        className="fixed top-0 left-0 h-screen w-full overflow-hidden bg-guardian-obsidian select-none flex flex-col justify-between z-10"
+      >
+        
+        {/* Full-Screen Looping Frame Sequence Background (fades naturally with parent sticky container) */}
+        <div className="absolute inset-0 z-0">
+          <FrameSequenceBackground onFrameChange={handleFrameChange} />
         </div>
 
-        {/* Center Column: Floating Transparent GIF Artwork (centered vertically & horizontally) */}
-        <div className="lg:col-span-5 flex justify-center items-center w-full z-0">
-          <HeroVisual />
+        {/* Background Ambient Glows (fade naturally with parent sticky container) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          {/* Left red/pink glow */}
+          <div className="absolute top-[20%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] rounded-full bg-guardian-crimson/10 blur-[130px] mix-blend-screen" />
+          {/* Center intense teal glow behind video */}
+          <div className="absolute top-[25%] left-[25%] w-[50vw] h-[50vw] max-w-[650px] rounded-full bg-guardian-cyan/10 blur-[150px] mix-blend-screen" />
+          {/* Right subtle teal glow */}
+          <div className="absolute bottom-[10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] rounded-full bg-guardian-cyan/10 blur-[130px] mix-blend-screen" />
         </div>
 
-        {/* Right Column: Reusable Vertical Sidebar Labels */}
-        <div className="lg:col-span-2 flex justify-start lg:justify-end items-center h-full z-10">
-          <HeroSidebar className="w-full lg:pl-10" />
-        </div>
-      </div>
-
-      {/* Bottom Row - Perfectly aligning Delegated Shield and How It Works on the exact same line */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 pb-8 pt-4 flex flex-row justify-between items-end gap-12">
-        {/* Left: Delegated Shield */}
-        <div className="flex flex-row gap-6 items-start max-w-lg">
-          <div className="flex-shrink-0 min-w-[120px]">
-            <h4 className="text-[9px] tracking-[0.2em] font-mono text-[#050816]/60 uppercase font-semibold">DELEGATED SHIELD</h4>
-            <h3 className="text-xs font-bold text-[#050816] mt-0.5 font-heading tracking-tight leading-tight">Zero-Trust Boundaries</h3>
-          </div>
-          
-          {/* Vertical divider */}
-          <div className="w-[1px] h-10 bg-[#050816]/15 self-stretch" />
-          
-          <p className="text-[10px] text-[#050816]/70 leading-relaxed font-sans font-medium max-w-xs">
-            Secure local execution contexts with fine-grained cryptographic caveats. Strip asset custody entirely while maintaining high-frequency sovereign transaction automation.
-          </p>
-        </div>
-
-        {/* Right: How It Works Play Button */}
-        <div 
-          onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-          className="flex items-center gap-4 group cursor-pointer select-none"
+        {/* Content Container (Grid) scaling, translating, and blurring on scroll while parent handles fade */}
+        <motion.div 
+          style={{ scale, y, filter }}
+          className="relative z-10 w-full h-full flex flex-col justify-center"
         >
-          {/* Circular play icon */}
-          <div className="w-10 h-10 rounded-full border border-slate-800 group-hover:border-primary-accent flex items-center justify-center transition-all duration-300 bg-slate-900/20 backdrop-blur-md flex-shrink-0">
-            <svg
-              className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary-accent ml-0.5 transition-colors duration-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-          <div className="flex flex-col items-start text-left">
-            <span className="block text-[10px] font-semibold tracking-widest font-mono text-slate-200 uppercase whitespace-nowrap">HOW IT WORKS</span>
-            <div className="text-[10px] text-slate-500 mt-0.5 font-light leading-snug whitespace-nowrap">
-              Watch cryptographic
-              <br />
-              session delegation.
+          {/* Main Grid Content */}
+          <main id="why-guardian" className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 flex flex-col justify-center py-4 lg:py-6">
+            
+            {/* Mobile Heading */}
+            <div className="block lg:hidden text-center mb-8">
+              <span className="text-[10px] font-semibold font-mono tracking-[0.2em] text-guardian-cyan uppercase block mb-2">
+                SYSTEM OVERVIEW
+              </span>
+              <h2 className="text-4xl font-black font-heading text-guardian-pearl leading-none tracking-tight">
+                Why Choose Guardian?
+              </h2>
             </div>
-          </div>
-        </div>
-      </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center w-full">
+              {/* Left Column - Card 01 & Card 03 */}
+              <div className="order-2 lg:order-1 lg:col-span-3 flex flex-col gap-6 w-full">
+                <FeatureCard
+                  number="01 / Autonomous Autonomy"
+                  title="Cryptographic Delegation"
+                  description="Delegate secure, non-custodial transaction authority to background AI agents."
+                  titleClassName="text-slate-100"
+                  isLit={activeGlowCard === 1}
+                  glowDirection="bottom-right"
+                />
+                <FeatureCard
+                  number="03 / Instant Zero-Gas Execution"
+                  title="Gasless 1Shot Relayer"
+                  description="Bypass network gas barriers via sponsored ERC-4337 transaction payloads."
+                  titleClassName="text-slate-100"
+                  isLit={activeGlowCard === 3}
+                  glowDirection="bottom-right"
+                />
+              </div>
+
+              {/* Center Column - Empty spacer to let the background video centerpiece shine through */}
+              <div className="order-1 lg:order-2 lg:col-span-6 min-h-[280px] lg:min-h-0 pointer-events-none" />
+
+              {/* Right Column - Card 02 & Card 04 */}
+              <div className="order-3 lg:order-3 lg:col-span-3 flex flex-col gap-6 w-full text-left">
+                {/* Desktop Heading */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="hidden lg:block select-none mb-2"
+                >
+                  <span className="text-[10px] font-semibold font-mono tracking-[0.2em] text-guardian-cyan uppercase block mb-2">
+                    SYSTEM OVERVIEW
+                  </span>
+                  <h2 className="text-4xl xl:text-[45px] font-black font-heading text-guardian-pearl leading-[0.95] tracking-tight">
+                    Why
+                    <br />
+                    Choose
+                    <br />
+                    Guardian?
+                  </h2>
+                </motion.div>
+
+                <FeatureCard
+                  number="02 / Professional Infrastructure"
+                  title="Enterprise-Grade Security"
+                  description="Intent-parsing pipelines backed by real-time monitoring and RPC relays."
+                  titleClassName="text-slate-100"
+                  isLit={activeGlowCard === 2}
+                  glowDirection="bottom-left"
+                />
+                <FeatureCard
+                  number="04 / Trust Boundary Enforcement"
+                  title="Real-Time Interception"
+                  description="An autonomous sentinel immediately blocks any boundary deviation."
+                  titleClassName="text-[#38bdf8]"
+                  hoverBorderClassName="hover:border-[#38bdf8]/30"
+                  isLit={activeGlowCard === 4}
+                  glowDirection="bottom-left"
+                />
+              </div>
+            </div>
+          </main>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

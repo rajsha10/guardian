@@ -12,9 +12,9 @@ export default function Panel({ children, className = '', variant = 'surface' }:
   const baseStyle = "rounded-xl p-6 shadow-xl transition-all duration-300 backdrop-blur-md";
   
   const variantStyles = {
-    surface: "bg-slate-900 border border-slate-800",
-    elevated: "bg-slate-950 border border-slate-800",
-    dashed: "bg-slate-900/40 border border-dashed border-slate-800"
+    surface: "bg-[#14161e] border border-guardian-pearl/10",
+    elevated: "bg-[#090a0f] border border-guardian-pearl/10",
+    dashed: "bg-transparent border border-dashed border-guardian-pearl/10"
   };
 
   return (

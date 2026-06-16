@@ -9,6 +9,7 @@ import Panel from '../shared/Panel';
 import { useGuardingState } from '../GuardingContext';
 import NavItem from '../navigation/NavItem';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 // Icons for mobile navigation
 const MobileMenuIcons = {
@@ -51,14 +52,15 @@ const MobileMenuIcons = {
 
 export default function GuardianShell({ children }: { children: ReactNode }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { smartAccount, sessionAddress, delegationRules, activeContextId } = useGuardingState();
+  const pathname = usePathname();
+  const { smartAccountAddress, sessionAddress, delegationRules, activeContextId, metrics, balances, recentTxs } = useGuardingState();
 
   const toggleMobileSidebar = () => {
     setMobileSidebarOpen(!mobileSidebarOpen);
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden relative text-slate-800 bg-[#F4F4F4]">
+    <div className="flex h-screen w-full overflow-hidden relative text-guardian-pearl bg-guardian-obsidian">
       {/* Background Layer */}
       <AmbientBackground />
 
@@ -81,25 +83,25 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed top-0 bottom-0 left-0 w-[270px] bg-slate-950 border-r border-[#050816]/10 z-50 p-6 flex flex-col justify-between"
+              className="md:hidden fixed top-0 bottom-0 left-0 w-[270px] bg-slate-950 border-r border-guardian-slate/40 z-50 p-6 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-[#050816] flex items-center justify-center text-primary-accent font-heading font-black text-sm">
+                    <div className="w-7 h-7 rounded-lg bg-guardian-charcoal flex items-center justify-center text-white border border-white/10 font-heading font-black text-sm">
                       G
                     </div>
-                    <span className="text-sm font-black font-heading tracking-tight text-[#050816] uppercase">
-                      DelegAI Guardian
+                    <span className="text-sm font-black font-heading tracking-tight text-guardian-pearl uppercase">
+                      Guardian
                     </span>
                   </div>
-                  <button onClick={toggleMobileSidebar} className="text-slate-500 hover:text-[#050816] cursor-pointer">
+                  <button onClick={toggleMobileSidebar} className="text-guardian-ash hover:text-guardian-pearl cursor-pointer">
                     {MobileMenuIcons.Close}
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-slate-400 uppercase">
+                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-guardian-ash uppercase">
                     Security Center
                   </div>
                   <div className="space-y-1" onClick={toggleMobileSidebar}>
@@ -108,7 +110,7 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
                     <NavItem href="/guarding/sessions" label="Session Keys" icon={MobileMenuIcons.Sessions} />
                   </div>
 
-                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-slate-400 uppercase mt-6">
+                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-guardian-ash uppercase mt-6">
                     Automation Suite
                   </div>
                   <div className="space-y-1" onClick={toggleMobileSidebar}>
@@ -116,7 +118,7 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
                     <NavItem href="/guarding/transactions" label="Transaction Relayer" icon={MobileMenuIcons.Transactions} />
                   </div>
 
-                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-slate-400 uppercase mt-6">
+                  <div className="text-[9px] font-bold tracking-[0.2em] font-mono text-guardian-ash uppercase mt-6">
                     System Configuration
                   </div>
                   <div className="space-y-1" onClick={toggleMobileSidebar}>
@@ -125,7 +127,7 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
                 </div>
               </div>
 
-              <div className="text-[9px] font-mono text-slate-500 text-center">
+              <div className="text-[9px] font-mono text-guardian-ash text-center">
                 DelegAI Shield System v0.1.0
               </div>
             </motion.aside>
@@ -139,23 +141,53 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
 
         {/* Content & Right Monitor Split */}
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 w-full overflow-hidden">
-          
+
           {/* Main Dashboard Pages (Left scrollable area) */}
           <main className="flex-1 overflow-y-auto px-6 py-8 relative">
             <div className="max-w-4xl mx-auto w-full">
-              {children}
+              {/* Live Local Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 font-mono">
+                <div className="bg-slate-950 p-4 rounded-xl border border-guardian-pearl/15">
+                  <div className="text-[10px] text-guardian-ash uppercase font-bold tracking-wider">AI Decisions</div>
+                  <div className="text-2xl font-bold text-white mt-1">{metrics.aiDecisions}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-guardian-pearl/15">
+                  <div className="text-[10px] text-guardian-ash uppercase font-bold tracking-wider">Approved Actions</div>
+                  <div className="text-2xl font-bold text-white mt-1">{metrics.successfulTxs}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-guardian-pearl/15">
+                  <div className="text-[10px] text-guardian-ash uppercase font-bold tracking-wider">Blocked Actions</div>
+                  <div className="text-2xl font-bold text-white mt-1">{metrics.blockedExecutions}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-guardian-pearl/15">
+                  <div className="text-[10px] text-guardian-ash uppercase font-bold tracking-wider">Gasless Relays</div>
+                  <div className="text-2xl font-bold text-white mt-1">{metrics.relayedTxs}</div>
+                </div>
+              </div>
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={pathname}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </main>
 
           {/* Right Status Monitor Panel (Desktop only, command center visualizer) */}
-          <section className="hidden lg:flex w-[310px] xl:w-[340px] border-l border-[#050816]/10 bg-slate-950/40 backdrop-blur-md flex-col p-6 overflow-y-auto space-y-6 flex-shrink-0 relative z-20">
-            
+          <section className="hidden lg:flex w-[310px] xl:w-[340px] border-l border-guardian-slate/40 bg-[#000612] backdrop-blur-md flex-col p-6 overflow-y-auto space-y-6 flex-shrink-0 relative z-20">
+
             {/* Panel Heading */}
-            <div className="border-b border-[#050816]/10 pb-4">
-              <span className="text-[9px] font-bold tracking-[0.2em] font-mono text-slate-500 uppercase block">
+            <div className="border-b border-guardian-slate/40 pb-4">
+              <span className="text-[9px] font-bold tracking-[0.2em] font-mono text-guardian-ash uppercase block">
                 Command Shield
               </span>
-              <h3 className="text-sm font-bold text-[#050816] mt-0.5 font-heading uppercase tracking-wide">
+              <h3 className="text-sm font-bold text-guardian-pearl mt-0.5 font-heading uppercase tracking-wide">
                 AI Agent Observer
               </h3>
             </div>
@@ -166,62 +198,122 @@ export default function GuardianShell({ children }: { children: ReactNode }) {
             </div>
 
             {/* Shield Parameters Ledger */}
-            <Panel variant="elevated" className="p-4 space-y-3.5 select-none font-mono text-[10px] bg-slate-900/50">
-              <div className="text-[9px] font-bold uppercase text-[#050816]/70 border-b border-[#050816]/10 pb-1.5 flex justify-between">
+            <Panel variant="elevated" className="p-4 space-y-3.5 select-none font-mono text-[10px] bg-slate-900/50 border border-white/5">
+              <div className="text-[9px] font-bold uppercase text-guardian-pearl/70 border-b border-white/10 pb-1.5 flex justify-between">
                 <span>Cryptographic Context</span>
-                <span className="text-primary-accent animate-pulse">● Live</span>
+                <span className="text-white/70 font-bold">● Active</span>
               </div>
 
               <div className="space-y-2.5">
                 <div>
-                  <span className="text-slate-500 block">SMART ACCOUNT (ERC-4337)</span>
-                  <span className="text-[#050816] break-all block text-[9.5px]">
-                    {smartAccount ? smartAccount : 'Awaiting initialization...'}
+                  <span className="text-guardian-ash block">SMART ACCOUNT (ERC-4337)</span>
+                  <span className="text-guardian-pearl break-all block text-[9.5px]">
+                    {smartAccountAddress ? smartAccountAddress : 'Awaiting initialization...'}
                   </span>
+                  {smartAccountAddress && (
+                    <span className="text-guardian-ash block text-[8.5px] mt-1">
+                      ETH Balance: {balances.smartAccountETH || '0.0000'} | USDC Balance: {balances.smartAccountUSDC !== null ? `${balances.smartAccountUSDC.toFixed(2)} USDC` : '0.00 USDC'}
+                    </span>
+                  )}
                 </div>
 
                 <div>
-                  <span className="text-slate-500 block">SESSION SIGNER (EOA)</span>
-                  <span className="text-[#050816] break-all block text-[9.5px]">
+                  <span className="text-guardian-ash block">SESSION SIGNER (EOA)</span>
+                  <span className="text-guardian-pearl break-all block text-[9.5px]">
                     {sessionAddress ? sessionAddress : 'Not generated'}
                   </span>
+                  {sessionAddress && (
+                    <span className="text-guardian-ash block text-[8.5px] mt-1">
+                      ETH Balance: {balances.sessionETH || '0.0000'}
+                    </span>
+                  )}
                 </div>
 
                 <div>
-                  <span className="text-slate-500 block">ACTIVE BOUNDARIES (RULES)</span>
+                  <span className="text-guardian-ash block">ACTIVE BOUNDARIES (RULES)</span>
                   {delegationRules ? (
-                    <div className="mt-1 space-y-0.5 text-slate-700 bg-white/40 p-1.5 rounded-lg border border-[#050816]/5">
+                    <div className="mt-1 space-y-0.5 text-guardian-ash bg-white/[0.02] p-1.5 rounded-lg border border-white/5">
                       <div>Limit: {delegationRules.spendLimit} USDC</div>
                       <div className="truncate">Whitelisted: {delegationRules.allowedAddress}</div>
                       <div>Lifecycle: {delegationRules.expiryDays} Days</div>
                     </div>
                   ) : (
-                    <span className="text-slate-500 block">No rules registered</span>
+                    <span className="text-guardian-ash block">No rules registered</span>
                   )}
                 </div>
 
                 <div>
-                  <span className="text-slate-500 block">ERC-7715 CONTEXT HASH</span>
-                  <span className="text-[#050816] break-all block text-[9.5px] truncate">
+                  <span className="text-guardian-ash block">ERC-7715 CONTEXT HASH</span>
+                  <span className="text-guardian-pearl break-all block text-[9.5px] truncate">
                     {activeContextId ? activeContextId : 'Awaiting signature'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-guardian-ash block">ACTIVE NETWORK</span>
+                  <span className="text-guardian-pearl block text-[9.5px]">
+                    Ethereum Sepolia Testnet (ID: 11155111)
                   </span>
                 </div>
               </div>
             </Panel>
 
+            {/* Recent Transactions Panel */}
+            <Panel variant="elevated" className="p-4 space-y-3 select-none font-mono text-[10px] bg-slate-900/50 border border-white/5">
+              <div className="text-[9px] font-bold uppercase text-guardian-pearl/70 border-b border-white/10 pb-1.5 flex justify-between">
+                <span>Recent Transactions</span>
+                <span className="text-white/50">● History</span>
+              </div>
+              {recentTxs && recentTxs.length > 0 ? (
+                <div className="space-y-3.5 divide-y divide-white/5 max-h-[220px] overflow-y-auto pr-1">
+                  {recentTxs.map((tx, idx) => (
+                    <div key={tx.hash} className={`pt-2 ${idx === 0 ? 'pt-0' : ''} space-y-1`}>
+                      <div className="flex justify-between items-center text-[9px]">
+                        <span className="text-white font-bold uppercase tracking-wide">✓ Relayed</span>
+                        <span className="text-guardian-ash text-[8px]">{tx.timestamp}</span>
+                      </div>
+                      <div className="text-guardian-ash/90">
+                        <span className="text-guardian-ash">Value:</span> {tx.amount} {tx.tokenSymbol}
+                      </div>
+                      <div className="text-guardian-ash/90 truncate">
+                        <span className="text-guardian-ash">To:</span> {tx.target}
+                      </div>
+                      <div className="flex justify-between items-center text-[8.5px] pt-0.5">
+                        <a
+                          href={`https://sepolia.etherscan.io/tx/${tx.hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white/70 hover:text-white underline font-semibold cursor-pointer"
+                        >
+                          View on Explorer
+                        </a>
+                        <span className="text-guardian-ash/80 select-all">
+                          {tx.hash.slice(0, 6)}...{tx.hash.slice(-4)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-guardian-ash italic py-1 text-center">
+                  No transaction history recorded.
+                </div>
+              )}
+            </Panel>
+
             {/* System logs tickers */}
-            <div className="flex-1 flex flex-col justify-end text-[9px] font-mono text-slate-400 space-y-1">
-              <div className="flex justify-between border-t border-[#050816]/5 pt-2">
+            <div className="flex-1 flex flex-col justify-end text-[9px] font-mono text-guardian-ash space-y-1">
+              <div className="flex justify-between border-t border-white/10 pt-2">
                 <span>MEM INTEGRITY</span>
-                <span className="text-emerald-400">100% SECURE</span>
+                <span className="text-white/70">100% SECURE</span>
               </div>
               <div className="flex justify-between">
                 <span>GAS RELAY</span>
-                <span className="text-indigo-400">PIPELINE READY</span>
+                <span className="text-white/70">PIPELINE READY</span>
               </div>
               <div className="flex justify-between">
-                <span>MANTLE BLOCK</span>
-                <span className="text-[#050816]">5003-SEPOLIA</span>
+                <span>SEPOLIA BLOCK</span>
+                <span className="text-white">11155111-SEPOLIA</span>
               </div>
             </div>
 

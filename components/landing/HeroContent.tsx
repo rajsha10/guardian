@@ -51,7 +51,7 @@ export default function HeroContent() {
           Freedom
           {/* Subtle custom vector arrow mimicking the reference swirl */}
           <svg
-            className="absolute -right-12 sm:-right-16 md:-right-20 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 md:w-14 h-14 text-primary-accent opacity-90 hidden sm:block pointer-events-none"
+            className="absolute -right-12 sm:-right-16 md:-right-20 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 md:w-14 h-14 text-guardian-cyan opacity-90 hidden sm:block pointer-events-none"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -70,7 +70,7 @@ export default function HeroContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-4 text-slate-400 text-xs sm:text-sm max-w-xs sm:max-w-[320px] font-sans font-semibold leading-relaxed tracking-wide select-none"
+        className="mt-4 text-guardian-ash text-xs sm:text-sm max-w-xs sm:max-w-[320px] font-sans font-semibold leading-relaxed tracking-wide select-none"
       >
         Securely delegate cryptographic constraints to autonomous AI agents, unlocking on-chain execution with zero-trust safety bounds.
       </motion.p>
@@ -87,7 +87,7 @@ export default function HeroContent() {
             {/* The thin outline circle with an exact gap where the text is placed */}
             <svg 
               viewBox="0 0 100 100" 
-              className="absolute w-24 h-24 stroke-[#050816]/70 group-hover:stroke-[#050816] transition-all duration-350 ease-out group-hover:scale-105 fill-none"
+              className="absolute w-24 h-24 stroke-guardian-cyan/70 group-hover:stroke-guardian-cyan transition-all duration-350 ease-out group-hover:scale-105 fill-none"
             >
               <path
                 d="M 10 27 A 46 46 0 1 1 27 90"
@@ -98,10 +98,10 @@ export default function HeroContent() {
             
             {/* The tilted text intersecting the bottom-left gap of the circle */}
             <div className="absolute -left-2 bottom-8 -rotate-[12deg] flex flex-col items-start transition-all duration-350 ease-out group-hover:scale-105 origin-center">
-              <span className="text-sm font-extrabold tracking-[0.08em] font-sans text-[#050816] group-hover:text-black transition-colors duration-300">
+              <span className="text-sm font-extrabold tracking-[0.08em] font-sans text-guardian-pearl group-hover:text-guardian-cyan transition-colors duration-300">
                 LAUNCH
               </span>
-              <span className="text-[10px] font-bold tracking-[0.12em] font-mono text-[#050816]/60 group-hover:text-[#050816]/90 mt-0.5">
+              <span className="text-[10px] font-bold tracking-[0.12em] font-mono text-guardian-ash group-hover:text-guardian-pearl/90 mt-0.5">
                 SHIELD
               </span>
             </div>
