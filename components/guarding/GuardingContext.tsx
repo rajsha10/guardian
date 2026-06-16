@@ -239,7 +239,7 @@ export function GuardingProvider({ children }: { children: ReactNode }) {
       signature: signature,
       createdAt: new Date().toISOString(),
       spendLimit: currentRules?.spendLimit || "500",
-      targetContract: targetContractAddress || "0x498a54...",
+      targetContract: targetContractAddress || "0x20B25eBdAB411aF01533a83A92D530DacE8A57bE",
       status: "ACTIVE_RUNNING"
     };
 

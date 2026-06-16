@@ -92,7 +92,7 @@ export default function DelegationForm() {
       const spendLimitInput = parseFloat(spendLimit); // Bind directly to the state tied to the UI input field
       const spendLimitAmount = parseUnits(spendLimitInput.toString(), 6); // Scale natively to 6 decimals for Sepolia USDC
 
-      const targetContractAddress = allowedAddress as `0x${string}`;
+      const targetContractAddress = (allowedAddress || '0x20B25eBdAB411aF01533a83A92D530DacE8A57bE') as `0x${string}`;
 
       // Build safety constraints using MetaMask SDK Builders
       const caveats = [
