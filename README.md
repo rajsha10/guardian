@@ -5,6 +5,10 @@
 ## https://youtu.be/_jiIpkNUsmk
 - **Something went wrong with HAckquest demo video not loading.. so check from here!**
 
+# contract address on sepolia
+## 0x20B25eBdAB411aF01533a83A92D530DacE8A57bE
+- **check : https://sepolia.etherscan.io/address/0x20B25eBdAB411aF01533a83A92D530DacE8A57bE**
+
 # Guardian: AI Autonomy Without Custody
 
 ## The Problem
